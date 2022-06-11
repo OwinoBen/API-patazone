@@ -427,7 +427,7 @@ class getSubCategoryProducts(ListAPIView):
 
 
 class getOfferProducts(ListAPIView):
-    queryset = PtzProducts.objects.filter(hot_deals=1)
+    queryset = PtzProducts.objects.filter(special_offer=1)
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (IsAuthenticated,)
@@ -448,6 +448,30 @@ class getFlashProducts(ListAPIView):
         return PtzProducts.objects.filter(featured=1)
 
 
+class getRecommendedProducts(ListAPIView):
+    serializer_class = ProductSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
+
+    def get_queryset(self):
+        return PtzProducts.objects.filter(is_recomended=1)
+
+
+class getRelatedProducts(ListAPIView):
+    serializer_class = ProductSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
+
+    def get_queryset(self):
+        return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcategory_id'])
+
+
 # @api_view(['GET'])
 # def getFlashProducts(request, id):
 #     print("flashProducts")
@@ -465,7 +489,7 @@ class getFlashProducts(ListAPIView):
 @permission_classes([IsAuthenticated, ])
 def getProductGallery(request, product_id):
     try:
-        gallery = PtzMultipleimgs.objects.all()
+        gallery = PtzMultipleimgs.objects.filter(product_id=product_id)
     except PtzMultipleimgs.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
