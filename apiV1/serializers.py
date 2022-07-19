@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import PtzAccountUsers, PtzProducts, PtzCustomers, Account, PtzCategories, PtzSubcategories, \
-    PtzSubsubcategories, PtzAddress, PtzMultipleimgs
+    PtzSubsubcategories, PtzAddress, PtzMultipleimgs, PtzMainslidersettings,PtzBrands
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -94,7 +94,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = PtzCategories
-        fields = ['id', 'category_name', 'category_icon', 'category_image', 'date_created']
+        fields = ['id', 'category_name', 'category_thumbnail', 'category_image', 'date_created']
 
 
 class SubcategorySerializer(serializers.ModelSerializer):
@@ -113,3 +113,15 @@ class userAddressSerializer(serializers.ModelSerializer):
     class Meta:
         model = PtzAddress
         fields = '__all__'
+
+
+class BannerSliderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PtzMainslidersettings
+        fields = '__all__'
+
+
+class BrandSeializer(serializers.ModelSerializer):
+    class Meta:
+        model = PtzBrands
+        fields = "__all__"

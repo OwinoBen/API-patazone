@@ -183,10 +183,12 @@ def create_auth_token(sender, instance=None, created=False, **kwargs):
 
 
 class PtzCategories(models.Model):
-    category_name = models.CharField(max_length=255)
-    category_icon = models.CharField(max_length=255, blank=True, null=True)
-    category_image = models.CharField(max_length=255)
+    category_name = models.CharField(max_length=30)
+    category_image = models.CharField(max_length=100)
+    category_thumbnail = models.CharField(max_length=100)
+    is_topcategory = models.IntegerField()
     date_created = models.DateTimeField()
+    soft_delete = models.IntegerField()
 
     class Meta:
         managed = False
@@ -194,7 +196,6 @@ class PtzCategories(models.Model):
 
     def __str__(self):
         return self.category_name
-
 
 class PtzSubcategories(models.Model):
     category_id = models.IntegerField()
@@ -247,3 +248,38 @@ class PtzAddress(models.Model):
 
     def __str__(self):
         return self.firstname
+
+
+class PtzMainslidersettings(models.Model):
+    category = models.ForeignKey(PtzCategories, models.DO_NOTHING, blank=True, null=True)
+    slider_image = models.CharField(max_length=255)
+    is_active = models.IntegerField()
+    main_slider = models.IntegerField(blank=True, null=True)
+    customer_slider = models.IntegerField(blank=True, null=True)
+    others = models.IntegerField(blank=True, null=True)
+    date_created = models.DateTimeField()
+    date_updated = models.IntegerField()
+    soft_delete = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'ptz_mainslidersettings'
+
+    def __str__(self):
+        return  self.slider_image
+
+class PtzBrands(models.Model):
+    category_id = models.IntegerField()
+    brand_title = models.CharField(max_length=255)
+    slug = models.CharField(max_length=255)
+    brand_image = models.CharField(max_length=255)
+    is_major = models.IntegerField(blank=True, null=True)
+    date_created = models.DateTimeField()
+    soft_delete = models.IntegerField()
+
+    class Meta:
+        managed = False
+        db_table = 'ptz_brands'
+
+    def __str__(self):
+        return self.brand_title

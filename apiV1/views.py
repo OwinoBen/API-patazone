@@ -18,18 +18,19 @@ from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 
 from .models import PtzAccountUsers, PtzProducts, Account, PtzCategories, PtzSubcategories, PtzSubsubcategories, \
-    PtzMultipleimgs
+    PtzMultipleimgs, PtzMainslidersettings, PtzBrands
 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
 
 from .serializers import UserSerializer, ProductSerializer, RegistrationSerializer, AccountPropertiesSerializer, \
-    RegisterSerializer, CategorySerializer, SubcategorySerializer, SubsubcategorySerializer, productGallerySerializer
+    RegisterSerializer, CategorySerializer, SubcategorySerializer, SubsubcategorySerializer, productGallerySerializer, \
+    BannerSliderSerializer,BrandSeializer
 
 
 # Create your views here.
@@ -405,7 +406,7 @@ class getProductsByCategoryID(ListAPIView):
     # queryset = PtzProducts.objects.all()
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
@@ -425,51 +426,46 @@ class getSubCategoryProducts(ListAPIView):
     def get_queryset(self):
         return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcateId'])
 
-
 class getOfferProducts(ListAPIView):
-    queryset = PtzProducts.objects.filter(special_offer=1)
+    queryset = PtzProducts.objects.filter(special_offer=1, is_varified='yes')
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
-
 
 class getFlashProducts(ListAPIView):
+    queryset = PtzProducts.objects.filter(featured='', is_varified='yes')
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
-
-    def get_queryset(self):
-        return PtzProducts.objects.filter(featured=1)
 
 
 class getRecommendedProducts(ListAPIView):
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
 
     def get_queryset(self):
-        return PtzProducts.objects.filter(is_recomended=1)
-
+        return PtzProducts.objects.filter(is_recomended=1, is_varified='yes')
 
 class getRelatedProducts(ListAPIView):
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    permission_classes = (AllowAny,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
 
     def get_queryset(self):
-        return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcategory_id'])
+        return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcategory_id'], is_varified='yes')
 
 
 # @api_view(['GET'])
@@ -486,7 +482,7 @@ class getRelatedProducts(ListAPIView):
 #
 
 @api_view(['GET'])
-@permission_classes([IsAuthenticated, ])
+@permission_classes([AllowAny, ])
 def getProductGallery(request, product_id):
     try:
         gallery = PtzMultipleimgs.objects.filter(product_id=product_id)
@@ -495,3 +491,33 @@ def getProductGallery(request, product_id):
     if request.method == 'GET':
         serializer = productGallerySerializer(gallery, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getBannerSliders(request):
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    try:
+        banner = PtzMainslidersettings.objects.filter(main_slider=1, is_active=1, soft_delete=0)
+        page_results = paginator.paginate_queryset(banner, request)
+    except PtzMainslidersettings.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        serializer = BannerSliderSerializer(page_results, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getBrands(request):
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    try:
+        brands = PtzBrands.objects.filter(is_major=1, soft_delete=0)
+        page_results = paginator.paginate_queryset(brands, request)
+    except PtzMainslidersettings.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        serializer = BrandSeializer(page_results, many=True)
+        return paginator.get_paginated_response(serializer.data)
