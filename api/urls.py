@@ -12,6 +12,5 @@ urlpatterns = [
     path('oauthlogin', views.user_login),
     path('registeruser', views.TokenView.as_view()),
     path('reg', views.RefreshToken.as_view()),
-    # path('/noexist/callback')
 
 ]

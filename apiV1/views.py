@@ -390,18 +390,6 @@ def getSingleSubsubcategory(request, subcategoryid):
         return Response(serializer.data)
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def getSingleProductDetails(request, slug):
-    try:
-        products = PtzProducts.objects.filter(slug=slug)
-    except PtzProducts.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'GET':
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-
 class getProductsByCategoryID(ListAPIView):
     # queryset = PtzProducts.objects.all()
     serializer_class = ProductSerializer
@@ -520,4 +508,18 @@ def getBrands(request):
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         serializer = BrandSeializer(page_results, many=True)
+        return paginator.get_paginated_response(serializer.data)
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def getSingleProductDetails(request, slug):
+    paginator = PageNumberPagination()
+    paginator.page_size = 10
+    try:
+        products = PtzProducts.objects.filter(id=slug)
+        page_results = paginator.paginate_queryset(products, request)
+    except PtzProducts.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        serializer = ProductSerializer(products, many=True)
         return paginator.get_paginated_response(serializer.data)

@@ -23,12 +23,6 @@ class ProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = PtzProducts
         fields = '__all__'
-        # fields = ['id', 'product_id', 'product_title', 'shop_name', 'slug', 'selling_price', 'discount_price',
-        #           'featured', 'product_thumbnail', 'product_sku', 'product_qty', 'special_offer',
-        #           'is_recomended', 'short_description', 'product_specification', 'long_description', 'is_varified',
-        #           'created_date']
-        # depth = 1
-        # fields = ['product_title']
 
 
 class RegistrationSerializer(serializers.ModelSerializer):
