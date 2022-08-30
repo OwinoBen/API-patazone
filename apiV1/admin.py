@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from .models import PtzAccountUsers, PtzProducts, PtzCustomers, Account, PtzCategories, PtzSubcategories, \
-    PtzSubsubcategories, PtzMultipleimgs, PtzMainslidersettings
+    PtzSubsubcategories, PtzMultipleimgs, PtzMainslidersettings, PtzAddress
 
 
 class AccountUsers(UserAdmin):
@@ -29,8 +29,8 @@ class AccountCustomers(UserAdmin):
 
 
 class Accounts(UserAdmin):
-    list_display = ('email', 'username', 'date_joined')
-    search_fields = ('email', 'username')
+    list_display = ('email', 'phone','date_joined')
+    search_fields = ('email', 'phone')
     readonly_fields = ('date_joined', 'last_login')
 
     filter_horizontal = ()
@@ -59,3 +59,4 @@ admin.site.register(PtzSubcategories)
 admin.site.register(PtzSubsubcategories)
 admin.site.register(PtzMultipleimgs)
 admin.site.register(PtzMainslidersettings)
+admin.site.register(PtzAddress)

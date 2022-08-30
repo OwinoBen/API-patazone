@@ -3,7 +3,8 @@ import stat
 from datetime import datetime
 
 import requests
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.hashers import check_password
 from django.db import transaction
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
@@ -16,6 +17,8 @@ from braces.views import CsrfExemptMixin
 from rest_framework import status, serializers
 from rest_framework.authtoken.models import Token
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.exceptions import ValidationError
+from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated, AllowAny
@@ -23,14 +26,16 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.views import APIView
 
 from .models import PtzAccountUsers, PtzProducts, Account, PtzCategories, PtzSubcategories, PtzSubsubcategories, \
-    PtzMultipleimgs, PtzMainslidersettings, PtzBrands
+    PtzMultipleimgs, PtzMainslidersettings, PtzBrands, PtzAddress
 
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.generics import ListAPIView
 
 from .serializers import UserSerializer, ProductSerializer, RegistrationSerializer, AccountPropertiesSerializer, \
     RegisterSerializer, CategorySerializer, SubcategorySerializer, SubsubcategorySerializer, productGallerySerializer, \
-    BannerSliderSerializer,BrandSeializer
+    BannerSliderSerializer, BrandSeializer, AddressSerializer
+
+GOOGLE_API_KEY = 'AIzaSyBdqMLdKIGQzrmt9zWOaBgwl9hY6KHGk7E'
 
 
 # Create your views here.
@@ -113,6 +118,7 @@ def addProduct(request):
 
 
 @api_view(['POST'])
+@permission_classes([AllowAny])
 def registration_view(request):
     if request.method == 'POST':
         serializer = RegistrationSerializer(data=request.data)
@@ -121,12 +127,47 @@ def registration_view(request):
             account = serializer.save()
             data['response'] = 'successfully registered new user'
             data['email'] = account.email
-            data['username'] = account.username
+            data['firstname'] = account.firstname
+            data['lastname'] = account.lastname
+            data['phone'] = account.phone
+            # data['username'] = account.username
             token = Token.objects.get(user=account).key
             data['token'] = token
         else:
             data = serializer.errors
         return Response(data)
+
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def saveCustomerAddress(request):
+    reqBody = request.data
+    # email1 = reqBody['email']
+    use_id = reqBody['user_id']
+    if request.method == 'POST':
+        # data = JSONParser().parse(request)
+        if PtzAddress.objects.filter(user_id=use_id).exists():
+            return Response({"error": "Default Address already exists"}, status=status.HTTP_400_BAD_REQUEST)
+        data = request.data
+        serializer = AddressSerializer(data=data, many=False)
+        if serializer.is_valid():
+            serializer.save()
+            return Response({"message": "Address added successfully", "data": serializer.data},
+                            status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getAddressList(request):
+    try:
+        subcate = PtzAddress.objects.filter(user_id=request.user.id)
+    except PtzSubcategories.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+    if request.method == 'GET':
+        print(request.user.id)
+        serializer = AddressSerializer(subcate, many=True)
+        return Response(serializer.data)
 
 
 class ApiProductsView(ListAPIView):
@@ -164,7 +205,7 @@ def update_account_view(request):
         data = {}
         if serializer.is_valid():
             serializer.save()
-            data['response'] = "Account successfullu updated"
+            data['response'] = "Account successfullY updated"
             return Response(data=data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -176,7 +217,7 @@ class ObatainAuthTokenView(APIView):
 
     def post(self, request):
         contex = {}
-        email = request.POST.get('username')
+        email = request.POST.get('email')
         password = request.POST.get('password')
         account = authenticate(email=email, password=password)
         if account:
@@ -193,6 +234,40 @@ class ObatainAuthTokenView(APIView):
             contex['error_message'] = "Invalid credentials"
 
         return Response(contex)
+
+
+@api_view(["POST"])
+@permission_classes([AllowAny])
+def login_user(request):
+    data = {}
+    reqBody = request.data
+    email1 = reqBody['email']
+    password = reqBody['password']
+    try:
+        account = Account.objects.get(email=email1)
+    except BaseException as e:
+        raise ValidationError({"400": f'{str(e)}'})
+
+    token = Token.objects.get_or_create(user=account)[0].key
+    if not check_password(password, account.password):
+        raise ValidationError({"message": "Incorrect Login credentials"})
+
+    if account:
+        if account.is_active:
+            print(request.user)
+            login(request, account)
+            data["message"] = "user logged in"
+            data["email_address"] = account.email
+
+            Res = {"data": data, "token": token}
+
+            return Response(Res)
+
+        else:
+            raise ValidationError({"400": f'Account not active'})
+
+    else:
+        raise ValidationError({"400": f'Account doesnt exist'})
 
 
 # user login with OAuth2 authentiation
@@ -256,6 +331,14 @@ def user_login(request):
             return Response({"error": error_msg}, status=status.HTTP_401_UNAUTHORIZED)
     else:
         return Response({'eror': 'error occured'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def logoutUser(request):
+    if logout(request):
+        logout(request)
+    return Response('User Logged out successfully')
 
 
 class RefreshToken(APIView):
@@ -414,6 +497,7 @@ class getSubCategoryProducts(ListAPIView):
     def get_queryset(self):
         return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcateId'])
 
+
 class getOfferProducts(ListAPIView):
     queryset = PtzProducts.objects.filter(special_offer=1, is_varified='yes')
     serializer_class = ProductSerializer
@@ -422,6 +506,7 @@ class getOfferProducts(ListAPIView):
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
+
 
 class getFlashProducts(ListAPIView):
     queryset = PtzProducts.objects.filter(featured='', is_varified='yes')
@@ -443,6 +528,7 @@ class getRecommendedProducts(ListAPIView):
 
     def get_queryset(self):
         return PtzProducts.objects.filter(is_recomended=1, is_varified='yes')
+
 
 class getRelatedProducts(ListAPIView):
     serializer_class = ProductSerializer
@@ -510,6 +596,7 @@ def getBrands(request):
         serializer = BrandSeializer(page_results, many=True)
         return paginator.get_paginated_response(serializer.data)
 
+
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def getSingleProductDetails(request, slug):
@@ -523,3 +610,28 @@ def getSingleProductDetails(request, slug):
     if request.method == 'GET':
         serializer = ProductSerializer(products, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def geocode_api(request, lat, lng):
+    # lat, lng = 40.714224, -73.961452
+    global results
+    api_key = GOOGLE_API_KEY
+    base_url = "https://maps.googleapis.com/maps/api/geocode/json"
+    endpoint = f"{base_url}?latlng={lat},{lng}&key={api_key}"
+    # see how our endpoint includes our API key? Yes this is yet another reason to restrict the key
+    r = requests.get(endpoint)
+    if r.status_code not in range(200, 299):
+        return None, None
+    try:
+        '''
+        This try block incase any of our inputs are invalid. This is done instead
+        of actually writing out handlers for all kinds of responses.
+        '''
+        results = r.json()['results'][0]
+        lat = results['geometry']['location']['lat']
+        lng = results['geometry']['location']['lng']
+    except:
+        pass
+    return Response(results, status=status.HTTP_200_OK)

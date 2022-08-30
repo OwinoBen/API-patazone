@@ -12,13 +12,15 @@ class Apiv1Account(models.Model):
     id = models.BigAutoField(primary_key=True)
     password = models.CharField(max_length=128)
     email = models.CharField(unique=True, max_length=60)
-    username = models.CharField(unique=True, max_length=30)
     date_joined = models.DateTimeField()
     last_login = models.DateTimeField()
     is_admin = models.IntegerField()
     is_active = models.IntegerField()
     is_staff = models.IntegerField()
     is_superuser = models.IntegerField()
+    firstname = models.CharField(max_length=30, blank=True, null=True)
+    lastname = models.CharField(max_length=30, blank=True, null=True)
+    phone = models.CharField(unique=True, max_length=30, blank=True, null=True)
 
     class Meta:
         managed = False
@@ -256,14 +258,17 @@ class PtzActivities(models.Model):
 
 
 class PtzAddress(models.Model):
-    user = models.ForeignKey('PtzCustomers', models.DO_NOTHING)
+    user_id = models.BigIntegerField()
     firstname = models.CharField(max_length=255)
     lastname = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
-    county = models.CharField(max_length=255)
-    region = models.CharField(max_length=255)
+    county = models.CharField(max_length=255, blank=True, null=True)
+    region = models.CharField(max_length=255, blank=True, null=True)
     street = models.CharField(max_length=255, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    latitude = models.CharField(max_length=255, blank=True, null=True)
+    longitude = models.CharField(max_length=255, blank=True, null=True)
     company_name = models.CharField(max_length=255, blank=True, null=True)
     is_default = models.IntegerField(db_column='is-default')  # Field renamed to remove unsuitable characters.
     address_type = models.CharField(max_length=255)
@@ -814,7 +819,7 @@ class PtzProducts(models.Model):
     product_tags = models.CharField(max_length=255)
     product_sku = models.CharField(max_length=255)
     product_qty = models.CharField(max_length=255)
-    cost_price = models.FloatField(blank=True, null=True)
+    cost_price = models.IntegerField(blank=True, null=True)
     selling_price = models.CharField(max_length=255)
     discount_price = models.CharField(max_length=255, blank=True, null=True)
     percentage = models.IntegerField(blank=True, null=True)

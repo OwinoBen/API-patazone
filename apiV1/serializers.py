@@ -1,7 +1,7 @@
 from rest_framework import serializers
 
 from .models import PtzAccountUsers, PtzProducts, PtzCustomers, Account, PtzCategories, PtzSubcategories, \
-    PtzSubsubcategories, PtzAddress, PtzMultipleimgs, PtzMainslidersettings,PtzBrands
+    PtzSubsubcategories, PtzAddress, PtzMultipleimgs, PtzMainslidersettings, PtzBrands
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -30,7 +30,7 @@ class RegistrationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['email', 'username', 'password', 'password2']
+        fields = ['email', 'firstname', 'lastname', 'phone', 'password', 'password2']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -38,7 +38,10 @@ class RegistrationSerializer(serializers.ModelSerializer):
     def save(self):
         account = Account(
             email=self.validated_data['email'],
-            username=self.validated_data['username']
+            # username=self.validated_data['username'],
+            firstname=self.validated_data['firstname'],
+            lastname=self.validated_data['lastname'],
+            phone=self.validated_data['phone'],
         )
 
         password = self.validated_data['password']
@@ -54,10 +57,17 @@ class RegistrationSerializer(serializers.ModelSerializer):
         return account
 
 
+class AddressSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PtzAddress
+        fields = ['user_id', 'firstname', 'lastname', 'phone', 'address', 'latitude', 'longitude', 'address_type',
+                  'is_default', 'date_created']
+
+
 class AccountPropertiesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Account
-        fields = ['id', 'email', 'username']
+        fields = ['id', 'email', 'firstname', 'lastname', 'phone']
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -65,16 +75,16 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Account
-        fields = ['email', 'username', 'password', 'password2']
+        fields = ['email', 'firstname', 'lastname', 'phone', 'password', 'password2']
         extra_kwargs = {
             'password': {'write_only': True}
         }
 
     def validate(self, data):
         try:
-            user = Account.objects.filter(username=data.get('username'))
+            user = Account.objects.filter(phone=data.get('phone'))
             if len(user) > 0:
-                raise serializers.ValidationError("Username already exists")
+                raise serializers.ValidationError("Phone number already exists")
         except Account.DoesNotExist:
             pass
 

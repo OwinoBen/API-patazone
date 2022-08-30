@@ -13,25 +13,32 @@ from rest_framework.authtoken.models import Token
 
 
 class apiAccount(BaseUserManager):
-    def create_user(self, email, username, password):
+    def create_user(self, email, password, firstname, lastname, phone):
         if not email:
             raise ValueError('Users must have an email address')
-        if not username:
-            raise ValueError('Username is required')
-
+        # if not username:
+        #     raise ValueError('Username is required')
+        if not firstname:
+            raise ValueError('Firstname is required')
+        if not lastname:
+            raise ValueError('Lastname is required')
+        if not phone:
+            raise ValueError('Phone number is required')
         user = self.model(
             email=self.normalize_email(email),
-            username=username
+            firstname=firstname,
+            lastname=lastname,
+            phone=phone,
         )
         user.set_password(password)
         user.save(using=self._db)
         return user
 
-    def create_superuser(self, email, username, password):
+    def create_superuser(self, email, phone, password):
         user = self.create_user(
             email=self.normalize_email(email),
             password=password,
-            username=username
+            phone=phone
         )
         user.is_admin = True
         user.is_staff = True
@@ -42,7 +49,10 @@ class apiAccount(BaseUserManager):
 
 class Account(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
-    username = models.CharField(max_length=30, unique=True)
+    # username = models.CharField(max_length=30, unique=True)
+    firstname = models.CharField(max_length=30, null=True, blank=True)
+    lastname = models.CharField(max_length=30, null=True, blank=True)
+    phone = models.CharField(max_length=30, null=True, blank=True, unique=True)
     date_joined = models.DateTimeField(verbose_name='date joined', auto_now_add=True)
     last_login = models.DateTimeField(verbose_name='last login', auto_now=True)
     is_admin = models.BooleanField(default=False)
@@ -51,7 +61,7 @@ class Account(AbstractBaseUser):
     is_superuser = models.BooleanField(default=False)
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['firstname', 'lastname', 'phone']
 
     objects = apiAccount()
 
@@ -197,6 +207,7 @@ class PtzCategories(models.Model):
     def __str__(self):
         return self.category_name
 
+
 class PtzSubcategories(models.Model):
     category_id = models.IntegerField()
     subcategory_name = models.CharField(max_length=255)
@@ -228,18 +239,21 @@ class PtzSubsubcategories(models.Model):
 
 
 class PtzAddress(models.Model):
-    user_id = models.IntegerField()
+    user_id = models.BigIntegerField()
     firstname = models.CharField(max_length=255)
     lastname = models.CharField(max_length=255)
     email = models.CharField(max_length=255)
     phone = models.CharField(max_length=255)
-    county = models.CharField(max_length=255)
-    region = models.CharField(max_length=255)
-    street = models.CharField(max_length=255)
-    company_name = models.CharField(max_length=255)
+    county = models.CharField(max_length=255, blank=True, null=True)
+    region = models.CharField(max_length=255, blank=True, null=True)
+    street = models.CharField(max_length=255, blank=True, null=True)
+    address = models.CharField(max_length=255, blank=True, null=True)
+    latitude = models.CharField(max_length=255, blank=True, null=True)
+    longitude = models.CharField(max_length=255, blank=True, null=True)
+    company_name = models.CharField(max_length=255, blank=True, null=True)
     is_default = models.IntegerField(db_column='is-default')  # Field renamed to remove unsuitable characters.
     address_type = models.CharField(max_length=255)
-    date_created = models.DateTimeField()
+    date_created = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         managed = False
@@ -266,7 +280,8 @@ class PtzMainslidersettings(models.Model):
         db_table = 'ptz_mainslidersettings'
 
     def __str__(self):
-        return  self.slider_image
+        return self.slider_image
+
 
 class PtzBrands(models.Model):
     category_id = models.IntegerField()
