@@ -3,8 +3,8 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib.auth.admin import UserAdmin
 
-from .models import PtzAccountUsers, PtzProducts, PtzCustomers, Account, PtzCategories, PtzSubcategories, \
-    PtzSubsubcategories, PtzMultipleimgs, PtzMainslidersettings, PtzAddress
+from auth_apps.models import PtzAccountUsers, Account
+from .models import PtzCustomers, PtzAddress
 
 
 class AccountUsers(UserAdmin):
@@ -51,12 +51,6 @@ class CategoriesView(UserAdmin):
 
 
 admin.site.register(PtzCustomers, AccountCustomers)
-admin.site.register(PtzProducts)
 admin.site.register(PtzAccountUsers, AccountUsers)
 admin.site.register(Account, Accounts)
-admin.site.register(PtzCategories,CategoriesView)
-admin.site.register(PtzSubcategories)
-admin.site.register(PtzSubsubcategories)
-admin.site.register(PtzMultipleimgs)
-admin.site.register(PtzMainslidersettings)
 admin.site.register(PtzAddress)

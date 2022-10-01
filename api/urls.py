@@ -9,8 +9,6 @@ urlpatterns = [
     path('', views.index, name="main"),
     path('api/', include('apiV1.urls')),
     path('o/', include('oauth2_provider.urls')),
-    path('oauthlogin', views.user_login),
-    path('registeruser', views.TokenView.as_view()),
-    path('reg', views.RefreshToken.as_view()),
+
 
 ]

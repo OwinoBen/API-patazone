@@ -42,6 +42,12 @@ INSTALLED_APPS = [
     'oauth2_provider',
 
     'apiV1',
+    'auth_apps',
+    'products',
+    'checkout',
+    'googleMaps',
+    'orders',
+    'categories'
 
 ]
 
@@ -63,7 +69,7 @@ REST_FRAMEWORK = {
 
 }
 
-AUTH_USER_MODEL = 'apiV1.Account'
+AUTH_USER_MODEL = 'auth_apps.Account'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -113,7 +119,7 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'patazons',
+        'NAME': 'patazonedb',
         'USER': 'root',
         'HOST': '127.0.0.1',
         'PORT': '3306',
