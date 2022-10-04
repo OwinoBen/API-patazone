@@ -126,6 +126,12 @@ DATABASES = {
         'PASSWORD': '',
 
     }
+
+        # 'NAME': 'patazonev2Final',
+        # 'USER': 'patazonez',
+        # 'HOST': '198.251.75.29',
+        # 'PORT': '3306',
+        # 'PASSWORD': '7a1f8eT$',
 }
 
 # Password validation
