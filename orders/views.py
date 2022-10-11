@@ -70,25 +70,27 @@ def placeOrder(request):
                 return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Mpesa Express':
                 mpesaPayment(order_id)
-                pass
+                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Card payment':
                 cardPayment(order_id)
-                pass
+                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Pay with paypal':
-                pass
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
             else:
-                pass
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
         else:
             if response['payment_mode'] == 'Lipalater plan':
                 lipaLaterPlan(order_id)
-                pass
+                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Equity plan':
                 equityPlan(order_id)
-                pass
+                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Angaza Plan':
-                pass
+                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
             else:
-                pass
+                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated])
