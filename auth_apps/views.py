@@ -111,8 +111,8 @@ def login_user(request):
     password = reqBody['password']
     try:
         account = Account.objects.get(email=email1)
-    except BaseException as e:
-        raise Response({"message": f'{str(e)}'})
+    except Account.DoesNotExist as e:
+        return Response({"message": 'The account with the email does not exist.'})
 
     token = Token.objects.get_or_create(user=account)[0].key
     if not check_password(password, account.password):
@@ -130,7 +130,7 @@ def login_user(request):
             return Response(Res)
 
         else:
-            return Response({"message": f'Account not active'})
+            return Response({"message": f'Account not active'},status=status.HTTP_400_BAD_REQUEST)
 
     else:
         return Response({"message": f'Account doesnt exist'})

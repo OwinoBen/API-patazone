@@ -62,12 +62,12 @@ def placeOrder(request):
                         if serializers.is_valid():
                             serializers.save()
                         else:
-                            print(serializer.errors)
-                            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                            print(serializers.errors)
+                            return Response({"message": serializers.errors}, status=status.HTTP_400_BAD_REQUEST)
                     sendSMS(phone, order_id)
                     return Response({"order_id": order_id, "message": "Order placed successfully"},
                                     status=status.HTTP_200_OK)
-                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Mpesa Express':
                 mpesaPayment(order_id)
                 return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
