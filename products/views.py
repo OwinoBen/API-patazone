@@ -81,7 +81,6 @@ class ApiProductsView(ListAPIView):
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
 
 
-
 class getProductsByCategoryID(ListAPIView):
     # queryset = PtzProducts.objects.all()
     serializer_class = ProductSerializer
@@ -98,7 +97,7 @@ class getProductsByCategoryID(ListAPIView):
 class getSubCategoryProducts(ListAPIView):
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
@@ -219,3 +218,20 @@ def getSingleProductDetails(request, slug):
     if request.method == 'GET':
         serializer = ProductSerializer(products, many=True)
         return paginator.get_paginated_response(serializer.data)
+
+
+@api_view(['GET'], )
+@permission_classes([AllowAny])
+def getProductsByBrands(request, brand_id):
+    paginator = PageNumberPagination()
+    paginator.page_size = 30
+    if brand_id is not None:
+        try:
+            brand_products = PtzProducts.objects.filter(brand_id=brand_id, is_varified='yes', product_qty__gte=1).order_by("?")
+            results = paginator.paginate_queryset(brand_products, request)
+        except PtzProducts.DoesNotExist:
+            return Response({"message: No product found in the database."}, status=status.HTTP_404_NOT_FOUND)
+
+        if request.method == 'GET':
+            serializer = ProductSerializer(results, many=True)
+            return paginator.get_paginated_response(serializer.data)

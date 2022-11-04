@@ -70,10 +70,12 @@ def placeOrder(request):
                 return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Mpesa Express':
                 mpesaPayment(order_id)
-                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Card payment':
                 cardPayment(order_id)
-                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Pay with paypal':
                 return Response({"message": "Payment method not available now, you can use cash option instead"},
                                 status=status.HTTP_400_BAD_REQUEST)
@@ -83,18 +85,24 @@ def placeOrder(request):
         else:
             if response['payment_mode'] == 'Lipalater plan':
                 lipaLaterPlan(order_id)
-                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Equity plan':
                 equityPlan(order_id)
-                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Angaza Plan':
-                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
             else:
-                return Response({"message":"Payment method not available now, you can use cash option instead"}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"message": "Payment method not available now, you can use cash option instead"},
+                                status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET', ])
 @permission_classes([IsAuthenticated])
 def getUserOrders(request):
+    global serializers
     userID = request.user.id
     try:
         orders = PtzOrders.objects.filter(user_id=userID)
@@ -105,7 +113,24 @@ def getUserOrders(request):
         return Response({"success": False, "message": "Order not found"})
     if request.method == 'GET':
         serializer = OrderSerializer(orders, many=True)
-        return Response({"order":serializer.data, "order_details": serializers.data}, status=status.HTTP_200_OK)
+        return Response({"order": serializer.data, "order_details": serializers.data}, status=status.HTTP_200_OK)
+
+
+@api_view(['GET', ])
+@permission_classes([IsAuthenticated], )
+def getOrderItems(request, orderid=None):
+    if orderid is not None:
+        orderID = str(orderid)
+        try:
+            orderItems = PtzCart.objects.filter(order='PTZORD9893', user_id=request.user.id)
+            print(orderid)
+        except PtzCart.DoesNotExist:
+            return Response({"success": False, "message": "Order items not found"})
+        if request.method == 'GET':
+            serializer = CartSerializer(orderItems, many=True)
+            return Response({"order_details": serializer.data}, status=status.HTTP_200_OK)
+    else:
+        return Response({"success": False, "message": "No order ID provided"})
 
 
 def cash_on_delivery_payment(response, order_id):

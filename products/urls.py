@@ -14,4 +14,5 @@ urlpatterns = [
     path('products/recommended', views.getRecommendedProducts.as_view(), name="recommended"),
     path('sliders/mainbanners', views.getBannerSliders, name="mainsliders"),
     path('products/brands', views.getBrands, name="brands"),
+    path('products/brands-products/<brand_id>', views.getProductsByBrands, name="brands-product"),
 ]

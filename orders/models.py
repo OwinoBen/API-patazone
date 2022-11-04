@@ -51,7 +51,7 @@ class PtzOrders(models.Model):
 class PtzCart(models.Model):
     user_id = models.CharField(max_length=255)
     product = models.ForeignKey(PtzProducts, models.CASCADE)
-    order = models.ForeignKey(PtzOrders, models.CASCADE)
+    order = models.ForeignKey(PtzOrders, on_delete=models.CASCADE)
     product_name = models.CharField(max_length=255)
     product_qty = models.IntegerField()
     product_price = models.CharField(max_length=255)
