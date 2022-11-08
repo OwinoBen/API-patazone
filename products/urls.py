@@ -7,6 +7,7 @@ urlpatterns = [
     path('list', views.ApiProductsView.as_view(), name="list"),
     path('category-products/<category_id>', views.getProductsByCategoryID.as_view(), name="category-products"),
     path('subcategory-products/<subcateId>', views.getSubCategoryProducts.as_view(), name="subcategory-products"),
+    path('sub-subcategory-products/<subsubcateId>', views.getSub_subCategoryProducts.as_view(), name="subsubcategory-products"),
     path('product/details/product-details/<slug>', views.getSingleProductDetails, name="productdetail"),
     path('products/offers/offerproducts', views.getOfferProducts.as_view(), name="offerproducts"),
     path('productgallery/<product_id>', views.getProductGallery, name="productgallery"),

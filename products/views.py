@@ -91,7 +91,8 @@ class getProductsByCategoryID(ListAPIView):
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
 
     def get_queryset(self):
-        return PtzProducts.objects.filter(category_id=self.kwargs['category_id']).order_by("?")
+        return PtzProducts.objects.filter(category_id=self.kwargs['category_id'], is_varified='yes',
+                                          product_qty__gte=1).order_by("?")
 
 
 class getSubCategoryProducts(ListAPIView):
@@ -103,11 +104,25 @@ class getSubCategoryProducts(ListAPIView):
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
 
     def get_queryset(self):
-        return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcateId']).order_by("?")
+        return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcateId'], product_qty__gte=1,
+                                          is_varified="yes").order_by("?")
+
+
+class getSub_subCategoryProducts(ListAPIView):
+    serializer_class = ProductSerializer
+    authentication_classes = (TokenAuthentication,)
+    # permission_classes = (IsAuthenticated,)
+    pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, OrderingFilter)
+    search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
+
+    def get_queryset(self):
+        return PtzProducts.objects.filter(sub_subcategory_id=self.kwargs['subsubcateId'], product_qty__gte=1,
+                                          is_varified="yes").order_by("?")
 
 
 class getOfferProducts(ListAPIView):
-    queryset = PtzProducts.objects.filter(special_offer=1, is_varified='yes').order_by('?')
+    queryset = PtzProducts.objects.filter(special_offer=1, is_varified='yes', product_qty__gte=1).order_by('?')
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny,)
@@ -117,7 +132,7 @@ class getOfferProducts(ListAPIView):
 
 
 class getFlashProducts(ListAPIView):
-    queryset = PtzProducts.objects.filter(featured='', is_varified='yes').order_by("?")
+    queryset = PtzProducts.objects.filter(featured='', is_varified='yes', product_qty__gte=1).order_by("?")
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny,)
@@ -135,7 +150,7 @@ class getRecommendedProducts(ListAPIView):
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
 
     def get_queryset(self):
-        return PtzProducts.objects.filter(is_recomended=1, is_varified='yes').order_by("?")
+        return PtzProducts.objects.filter(is_recomended=1, is_varified='yes', product_qty__gte=1).order_by("?")
 
 
 class getRelatedProducts(ListAPIView):
@@ -147,7 +162,8 @@ class getRelatedProducts(ListAPIView):
     search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
 
     def get_queryset(self):
-        return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcategory_id'], is_varified='yes').order_by("?")
+        return PtzProducts.objects.filter(subcategory_id=self.kwargs['subcategory_id'], is_varified='yes',
+                                          product_qty__gte=1).order_by("?")
 
 
 # @api_view(['GET'])
@@ -172,7 +188,7 @@ def getProductGallery(request, product_id):
         return Response(status=status.HTTP_404_NOT_FOUND)
     if request.method == 'GET':
         serializer = productGallerySerializer(gallery, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({"results": serializer.data}, status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
@@ -227,7 +243,8 @@ def getProductsByBrands(request, brand_id):
     paginator.page_size = 30
     if brand_id is not None:
         try:
-            brand_products = PtzProducts.objects.filter(brand_id=brand_id, is_varified='yes', product_qty__gte=1).order_by("?")
+            brand_products = PtzProducts.objects.filter(brand_id=brand_id, is_varified='yes',
+                                                        product_qty__gte=1).order_by("?")
             results = paginator.paginate_queryset(brand_products, request)
         except PtzProducts.DoesNotExist:
             return Response({"message: No product found in the database."}, status=status.HTTP_404_NOT_FOUND)
