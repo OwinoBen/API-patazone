@@ -2,9 +2,9 @@ from django.urls import path
 
 from auth_apps import views
 
-app_name='auth_apps'
+app_name = 'auth_apps'
 
-urlpatterns =[
+urlpatterns = [
     path('createuser', views.registration_view, name="createuser"),
     path('login', views.login_user, name="login"),
     path('logout', views.logoutUser, name="logout"),
@@ -13,4 +13,5 @@ urlpatterns =[
     path('oauthlogin', views.user_login),
     path('registeruser', views.TokenView.as_view()),
     path('reg', views.RefreshToken.as_view()),
+    path('account/delete-user', views.CloseUserAccount, name="close-account")
 ]

@@ -5,12 +5,15 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from rest_framework.authtoken.models import Token
 
-
 from api import settings
+
+AUTH_PROVIDERS = {
+    'email': 'email', 'google': 'google', 'twitter': 'twitter', 'facebook': 'facebook'
+}
 
 
 class apiAccount(BaseUserManager):
-    def create_user(self, email, password, firstname, lastname, phone):
+    def create_user(self, email, password, firstname, lastname, phone, auth_provider):
         if not email:
             raise ValueError('Users must have an email address')
         # if not username:
@@ -21,11 +24,14 @@ class apiAccount(BaseUserManager):
             raise ValueError('Lastname is required')
         if not phone:
             raise ValueError('Phone number is required')
+        if not auth_provider:
+            raise ValueError('Auth provider is required')
         user = self.model(
             email=self.normalize_email(email),
             firstname=firstname,
             lastname=lastname,
             phone=phone,
+            auth_provider=auth_provider
         )
         user.set_password(password)
         user.save(using=self._db)
@@ -37,8 +43,9 @@ class apiAccount(BaseUserManager):
             password=password,
             phone=phone,
             firstname=firstname,
-            lastname=lastname
+            lastname=lastname,
         )
+        user.auth_provider = AUTH_PROVIDERS.get('email')
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
@@ -58,6 +65,7 @@ class Account(AbstractBaseUser):
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
+    auth_provider = models.CharField(max_length=255, blank=False, null=False, default=AUTH_PROVIDERS.get('email'))
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['phone', 'firstname', 'lastname']

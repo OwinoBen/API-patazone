@@ -16,7 +16,7 @@ def getCategories(request):
     paginator = PageNumberPagination()
     paginator.page_size = 10
     try:
-        categories = PtzCategories.objects.all()
+        categories = PtzCategories.objects.filter(is_topcategory=1)
         page_results = paginator.paginate_queryset(categories, request)
     except PtzCategories.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
@@ -66,7 +66,7 @@ def getSingleSubsubcategory(request, categoryid):
     paginator = PageNumberPagination()
     paginator.page_size = 10
     try:
-        subcate = PtzSubsubcategories.objects.filter(category_id=categoryid)
+        subcate = PtzSubsubcategories.objects.filter(category_id=categoryid).order_by("?")
         page_results = paginator.paginate_queryset(subcate, request)
     except PtzSubsubcategories.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)

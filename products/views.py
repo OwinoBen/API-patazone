@@ -17,7 +17,7 @@ from products.serializers import ProductSerializer, \
 
 
 @api_view(['GET', ])
-@permission_classes((IsAuthenticated,))
+# @permission_classes((IsAuthenticated,))
 def viewProducts(request):
     try:
         products = PtzProducts.objects.all()
@@ -75,10 +75,10 @@ class ApiProductsView(ListAPIView):
     queryset = PtzProducts.objects.all().order_by("?")
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
-    search_fields = ('product_title', 'selling_price', 'discount_price', 'product_tags', 'product_sku')
+    search_fields = ('product_title', '^discount_price', 'product_tags')
 
 
 class getProductsByCategoryID(ListAPIView):

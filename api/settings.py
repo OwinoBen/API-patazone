@@ -20,9 +20,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-@7+_v1fau)q+4u!f)5*k&@u9b9qitfdt!h^-4nlf=pr45+otc0'
+# print(os.environ.get('SECRET_KEY'))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
@@ -48,8 +49,8 @@ INSTALLED_APPS = [
     'checkout',
     'googleMaps',
     'orders',
-    'categories'
-
+    'categories',
+    'socialAuth'
 ]
 
 OAUTH2_PROVIDER = {
@@ -125,7 +126,7 @@ DATABASES = {
         'USER': 'root',
         'HOST': '127.0.0.1',
         'PORT': '3306',
-        'PASSWORD': 'patazone123',
+        'PASSWORD': '',
 
     }
 

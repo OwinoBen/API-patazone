@@ -9,6 +9,4 @@ urlpatterns = [
     path('', views.index, name="main"),
     path('api/', include('apiV1.urls')),
     path('o/', include('oauth2_provider.urls')),
-
-
 ]

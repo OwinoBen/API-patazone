@@ -130,7 +130,7 @@ def login_user(request):
             return Response(Res)
 
         else:
-            return Response({"message": f'Account not active'},status=status.HTTP_400_BAD_REQUEST)
+            return Response({"message": f'Account not active'}, status=status.HTTP_400_BAD_REQUEST)
 
     else:
         return Response({"message": f'Account doesnt exist'})
@@ -279,3 +279,25 @@ class TokenView(APIView, CsrfExemptMixin, OAuthLibMixin):
 
         url, headers, body, status = self.create_token_response(request)
         return Response(body, status=status, headers=headers)
+
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated, ])
+def CloseUserAccount(request):
+    try:
+        user = Account.objects.get(id=request.user.id)
+        token = Token.objects.get(user=request.user)
+    except Account.DoesNotExist:
+        return Response({'message': 'Account with this info does not Exist'}, status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'DELETE':
+        delete_operation = user.delete()
+        data = {}
+        if delete_operation:
+            token.delete()
+            data["success"] = "Account successfully closed."
+            stat = status.HTTP_200_OK
+        else:
+            data['failed'] = "Account close operation failed"
+            stat = status.HTTP_400_BAD_REQUEST
+        return Response(data=data, status=stat)
