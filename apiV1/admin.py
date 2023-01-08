@@ -29,7 +29,7 @@ class AccountCustomers(UserAdmin):
 
 
 class Accounts(UserAdmin):
-    list_display = ('email', 'phone','date_joined')
+    list_display = ('email', 'phone','date_joined', 'auth_provider')
     search_fields = ('email', 'phone')
     readonly_fields = ('date_joined', 'last_login')
 

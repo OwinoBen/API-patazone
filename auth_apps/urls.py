@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 
 from auth_apps import views
 
@@ -13,5 +13,6 @@ urlpatterns = [
     path('oauthlogin', views.user_login),
     path('registeruser', views.TokenView.as_view()),
     path('reg', views.RefreshToken.as_view()),
-    path('account/delete-user', views.CloseUserAccount, name="close-account")
+    path('account/delete-user', views.CloseUserAccount, name="close-account"),
+    path('social-auth/', include('socialAuth.urls'))
 ]

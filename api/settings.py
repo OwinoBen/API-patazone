@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 """
 import os
 from pathlib import Path
+from dotenv import load_dotenv
 
+load_dotenv()
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -19,8 +21,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-@7+_v1fau)q+4u!f)5*k&@u9b9qitfdt!h^-4nlf=pr45+otc0'
+SECRET_KEY = os.getenv('SECRET_KEY')
 # print(os.environ.get('SECRET_KEY'))
+
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -36,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    #'whitenoise.runserver_nostatic',
+    # 'whitenoise.runserver_nostatic',
 
     'corsheaders',
     'rest_framework',
@@ -75,7 +78,7 @@ AUTH_USER_MODEL = 'auth_apps.Account'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    #'whitenoise.middleware.WhiteNoiseMiddleware',
+    # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
     'django.middleware.common.CommonMiddleware',
@@ -84,8 +87,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-#authorize link
-#http://127.0.0.1:8000/o/authorize/?response_type=code&code_challenge=XRi41b-5yHtTojvCpXFpsLUnmGFz6xR15c3vpPANAvM&client_id=YIynQ80KB0Kh1yATZwIxFTRxSHuXCKHndLnjOOer&redirect_uri=http://127.0.0.1:8000/noexist/callback
+# authorize link
+# http://127.0.0.1:8000/o/authorize/?response_type=code&code_challenge=XRi41b-5yHtTojvCpXFpsLUnmGFz6xR15c3vpPANAvM&client_id=YIynQ80KB0Kh1yATZwIxFTRxSHuXCKHndLnjOOer&redirect_uri=http://127.0.0.1:8000/noexist/callback
 ROOT_URLCONF = 'api.urls'
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOW_CREDENTIALS = True
@@ -123,18 +126,20 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'patazonedb',
-        'USER': 'root',
-        'HOST': '127.0.0.1',
+        'USER': 'admin',
+        'HOST': 'ec2-34-198-48-156.compute-1.amazonaws.com',
         'PORT': '3306',
-        'PASSWORD': '',
+        'PASSWORD': 'patazone123',
 
     }
 
-        # 'NAME': 'patazonev2Final',
-        # 'USER': 'patazonez',
-        # 'HOST': '198.251.75.29',
+
+
+        # 'NAME': 'patazonedb',
+        # 'USER': 'root',
+        # 'HOST': '127.0.0.1',
         # 'PORT': '3306',
-        # 'PASSWORD': '7a1f8eT$',
+        # 'PASSWORD': '',
 }
 
 # Password validation
@@ -173,7 +178,7 @@ STATIC_URL = 'static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 
-#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field

@@ -16,7 +16,7 @@ from oauth2_provider.views.mixins import OAuthLibMixin
 from rest_framework import status, permissions
 from rest_framework.authtoken.models import Token
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.exceptions import ValidationError
+from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -119,18 +119,20 @@ def login_user(request):
         return Response({"message": "Incorrect signin credentials"})
 
     if account:
-        if account.is_active:
-            print(request.user)
-            login(request, account)
-            data["message"] = "user logged in"
-            data["email_address"] = account.email
-
-            Res = {"data": data, "token": token}
-
-            return Response(Res)
-
+        if account.auth_provider != 'email':
+            raise AuthenticationFailed(detail='Please login using ' + account.auth_provider)
+            # return Response({"message": "Incorrect signin credentials"})
         else:
-            return Response({"message": f'Account not active'}, status=status.HTTP_400_BAD_REQUEST)
+            if account.is_active:
+                login(request, account)
+                data["message"] = "user logged in"
+                data["email_address"] = account.email
+                Res = {"data": data, "token": token}
+
+                return Response(Res)
+
+            else:
+                return Response({"message": f'Account not active'}, status=status.HTTP_400_BAD_REQUEST)
 
     else:
         return Response({"message": f'Account doesnt exist'})
@@ -166,8 +168,7 @@ def user_login(request):
                     contex['access_token'] = token
                 else:
                     if not Application.objects.filter(user=1).exists():
-                        Application.objects.create(user_id=6, authorization_grant_type='cre',
-                                                   client_type='confidential')
+                        Application.objects.create(user_id=6, authorization_grant_type='cre', client_type='confidential')
                     app_obj = Application.objects.filter(user=6)
                     if app_obj:
                         app_obj = app_obj[0]
@@ -288,7 +289,7 @@ def CloseUserAccount(request):
         user = Account.objects.get(id=request.user.id)
         token = Token.objects.get(user=request.user)
     except Account.DoesNotExist:
-        return Response({'message': 'Account with this info does not Exist'}, status=status.HTTP_404_NOT_FOUND)
+        return Response({'failed': 'Account with this info does not Exist'}, status=status.HTTP_404_NOT_FOUND)
 
     if request.method == 'DELETE':
         delete_operation = user.delete()
@@ -298,6 +299,6 @@ def CloseUserAccount(request):
             data["success"] = "Account successfully closed."
             stat = status.HTTP_200_OK
         else:
-            data['failed'] = "Account close operation failed"
+            data['failed'] = "Account closing failed"
             stat = status.HTTP_400_BAD_REQUEST
         return Response(data=data, status=stat)
