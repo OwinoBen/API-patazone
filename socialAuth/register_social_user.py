@@ -16,6 +16,7 @@ def register_social_user(provider, user_id, email, firstname, lastname):
             registered_user = authenticate(
                 email=email, password=os.getenv('SOCIAL_SECRET'))
             data["message"] = "user logged in"
+            data['new_user'] = False
             data["email_address"] = registered_user.email
             Res = {"data": data, "token": token}
             return Res
@@ -33,7 +34,8 @@ def register_social_user(provider, user_id, email, firstname, lastname):
         user.save()
         new_user = authenticate(email=email, password=os.getenv('SOCIAL_SECRET'))
 
-        data['message'] = 'Thank you for joining patazone!'
+        data['message'] = 'Welcome to Patazone!'
+        data['new_user'] = True
         data['email'] = new_user.email
         data['firstname'] = new_user.firstname
         data['lastname'] = new_user.lastname

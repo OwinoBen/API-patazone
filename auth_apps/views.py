@@ -59,19 +59,19 @@ def account_property_view(request):
         return Response(serializer.data)
 
 
-@api_view(['PUT'])
+@api_view(['PATCH'])
 @permission_classes((IsAuthenticated,))
 def update_account_view(request):
     try:
-        acount = request.user
+        account = request.user
     except Account.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
-    if request.method == 'PUT':
-        serializer = AccountPropertiesSerializer(acount, data=request.data)
+    if request.method == 'PATCH':
+        serializer = AccountPropertiesSerializer(account, data=request.data)
         data = {}
         if serializer.is_valid():
             serializer.save()
-            data['response'] = "Account successfullY updated"
+            data['response'] = "Account successfully updated"
             return Response(data=data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
