@@ -29,7 +29,7 @@ class PtzProducts(models.Model):
     sub_subcategory_id = models.IntegerField(blank=True, null=True)
     product_tags = models.CharField(max_length=255)
     # product_gallery = models.ForeignKey(PtzMultipleimgs, null=True, blank=True, on_delete=models.CASCADE)
-    product_sku = models.CharField(max_length=255)
+    product_sku = models.CharField(max_length=255, blank=True)
     product_qty = models.CharField(max_length=255)
     selling_price = models.CharField(max_length=255)
     discount_price = models.CharField(max_length=255, blank=True, null=True)
