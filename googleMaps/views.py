@@ -1,11 +1,15 @@
+import os
+
 import requests
 from rest_framework import status
 from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from dotenv import load_dotenv
 
-GOOGLE_API_KEY = 'AIzaSyBdqMLdKIGQzrmt9zWOaBgwl9hY6KHGk7E'
+load_dotenv()
 
+GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
