@@ -112,7 +112,7 @@ def login_user(request):
     try:
         account = Account.objects.get(email=email1)
     except Account.DoesNotExist as e:
-        return Response({"message": 'The account with the email does not exist.'})
+        return Response({"message": 'Incorrect signin credentials.'})
 
     token = Token.objects.get_or_create(user=account)[0].key
     if not check_password(password, account.password):

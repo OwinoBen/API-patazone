@@ -26,9 +26,11 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = True  # turning false to allow error 500 displayed as json
 
 ALLOWED_HOSTS = ['*']
+
+APPEND_SLASH = False  # REMOVE THE TRAILING SLASH IN URL e.g http://127.0.0.1:8000/
 
 # Application definition
 
@@ -63,10 +65,13 @@ OAUTH2_PROVIDER = {
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
-        'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
+        # 'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 24,
+
+    # 'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
+    'EXCEPTION_HANDLER': 'utils.errors.exceptionhandler.customExceptionHandler'
 
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAuthenticated',
@@ -77,7 +82,9 @@ REST_FRAMEWORK = {
 AUTH_USER_MODEL = 'auth_apps.Account'
 
 MIDDLEWARE = [
+    'middleware.middleware.CustomHeaderMiddleware',
     'django.middleware.security.SecurityMiddleware',
+
     # 'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     "corsheaders.middleware.CorsMiddleware",
@@ -86,6 +93,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
 ]
 # authorize link
 # http://127.0.0.1:8000/o/authorize/?response_type=code&code_challenge=XRi41b-5yHtTojvCpXFpsLUnmGFz6xR15c3vpPANAvM&client_id=YIynQ80KB0Kh1yATZwIxFTRxSHuXCKHndLnjOOer&redirect_uri=http://127.0.0.1:8000/noexist/callback
@@ -125,21 +133,20 @@ WSGI_APPLICATION = 'api.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
+        # 'NAME': 'patazonedb',
+        # 'USER': 'admin',
+        # 'HOST': 'ec2-34-198-48-156.compute-1.amazonaws.com',
+        # 'PORT': '3306',
+        # 'PASSWORD': 'patazone123',
+
         'NAME': 'patazonedb',
-        'USER': 'admin',
-        'HOST': 'ec2-34-198-48-156.compute-1.amazonaws.com',
+        'USER': 'root',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
-        'PASSWORD': 'patazone123',
+        'PASSWORD': '',
 
     }
 
-
-
-        # 'NAME': 'patazonedb',
-        # 'USER': 'root',
-        # 'HOST': '127.0.0.1',
-        # 'PORT': '3306',
-        # 'PASSWORD': '',
 }
 
 # Password validation
@@ -177,6 +184,9 @@ USE_TZ = True
 STATIC_URL = 'static/'
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 
 # STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 

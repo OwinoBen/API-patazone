@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 
 from auth_apps.models import PtzAccountUsers, Account
-from .models import PtzCustomers, PtzAddress
+from .models import PtzCustomers, PtzAddress, Categories, Subcategories, SubsubCategories
 
 
 class AccountUsers(UserAdmin):
@@ -54,3 +54,6 @@ admin.site.register(PtzCustomers, AccountCustomers)
 admin.site.register(PtzAccountUsers, AccountUsers)
 admin.site.register(Account, Accounts)
 admin.site.register(PtzAddress)
+admin.site.register(Categories)
+admin.site.register(Subcategories)
+admin.site.register(SubsubCategories)

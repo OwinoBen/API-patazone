@@ -180,3 +180,16 @@ def sendSMS(phone, orderID):
 def is_phone_number_valid(request, phone):
     print(phone[-9:])
     return Response({"matched": True})
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def getOrders(request):
+    try:
+        orders = PtzOrders.objects.all()
+    except PtzOrders.DoesNotExist:
+        return Response({"success": False, "message": "Order not found"})
+
+    if request.method == "GET":
+        serializer = OrderSerializer(orders, many=True)
+        return Response({"order": serializer.data}, status=status.HTTP_200_OK)

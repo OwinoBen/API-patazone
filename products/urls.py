@@ -1,13 +1,27 @@
-from django.urls import path
+from django.urls import path, include
 from products import views
+from .views import ProductsViewSet
+
+# from rest_framework.routers import DefaultRouter
+from rest_framework_nested import routers
+
+from rest_framework import routers
 
 app_name = 'products'
 
+router = routers.DefaultRouter()
+
+router.register('product', ProductsViewSet)
+
+# product_router = routers.NestedDefaultRouter(router, 'product', lookup='products')
+
 urlpatterns = [
+    path('', include(router.urls)),
     path('list', views.ApiProductsView.as_view(), name="list"),
     path('category-products/<category_id>', views.getProductsByCategoryID.as_view(), name="category-products"),
     path('subcategory-products/<subcateId>', views.getSubCategoryProducts.as_view(), name="subcategory-products"),
-    path('sub-subcategory-products/<subsubcateId>', views.getSub_subCategoryProducts.as_view(), name="subsubcategory-products"),
+    path('sub-subcategory-products/<subsubcateId>', views.getSub_subCategoryProducts.as_view(),
+         name="subsubcategory-products"),
     path('product/details/product-details/<slug>', views.getSingleProductDetails, name="productdetail"),
     path('products/offers/offerproducts', views.getOfferProducts.as_view(), name="offerproducts"),
     path('productgallery/<product_id>', views.getProductGallery, name="productgallery"),
@@ -16,4 +30,7 @@ urlpatterns = [
     path('sliders/mainbanners', views.getBannerSliders, name="mainsliders"),
     path('products/brands', views.getBrands, name="brands"),
     path('products/brands-products/<brand_id>', views.getProductsByBrands, name="brands-product"),
+
+    # path("all-products", include(product_router.urls))
+    path('all-products', views.ProductsViewSet)
 ]

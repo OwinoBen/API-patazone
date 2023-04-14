@@ -12,7 +12,7 @@ class tbl_orders(models.Model):
     amount_paid = models.CharField(max_length=255, blank=True, null=True)
     shipping_fee = models.CharField(max_length=255, blank=True, null=True)
     discount = models.CharField(max_length=255, blank=True, null=True)
-    is_paid = models.IntegerField(default=0, max_length=10)
+    is_paid = models.IntegerField(default=0)
     order_notes = models.TextField(blank=True, null=True)
     payment_mode = models.CharField(max_length=255, blank=True, null=True)
     order_status = models.CharField(max_length=255)

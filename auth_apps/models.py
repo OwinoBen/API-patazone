@@ -49,6 +49,7 @@ class apiAccount(BaseUserManager):
         user.is_admin = True
         user.is_staff = True
         user.is_superuser = True
+        user.is_vendor = False
         user.save()
         return user
 
@@ -64,6 +65,7 @@ class Account(AbstractBaseUser):
     is_admin = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
+    is_vendor = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     auth_provider = models.CharField(max_length=255, blank=False, null=False, default=AUTH_PROVIDERS.get('email'))
 

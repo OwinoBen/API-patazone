@@ -6,5 +6,9 @@ urlpatterns = [
     path('placeorder', views.placeOrder, name="place-order"),
     path('messages/<phone>', views.is_phone_number_valid, name="messages"),
     path('customer-orders', views.getUserOrders, name="customer-orders"),
-    path('orderItems/<orderid>', views.getOrderItems, name="order-items")
+    path('orderItems/<orderid>', views.getOrderItems, name="order-items"),
+    path('list', views.getOrders, name="orders-list")
 ]
+
+
+
