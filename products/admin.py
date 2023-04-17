@@ -3,7 +3,7 @@ from django.contrib import admin
 # Register your models here.
 from django.contrib.auth.admin import UserAdmin
 
-from products.models import PtzProducts, PtzCategories, PtzMultipleimgs, PtzMainslidersettings, ProductModel, Brands, \
+from products.models import PtzProducts, PtzCategories, PtzMultipleimgs, PtzMainslidersettings, Product, Brands, \
     ProductImages
 
 
@@ -23,6 +23,6 @@ admin.site.register(PtzCategories, CategoriesView)
 
 admin.site.register(PtzMultipleimgs)
 admin.site.register(PtzMainslidersettings)
-admin.site.register(ProductModel)
+admin.site.register(Product)
 admin.site.register(Brands)
 admin.site.register(ProductImages)

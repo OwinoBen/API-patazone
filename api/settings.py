@@ -55,7 +55,8 @@ INSTALLED_APPS = [
     'googleMaps',
     'orders',
     'categories',
-    'socialAuth'
+    'socialAuth',
+    'address'
 ]
 
 OAUTH2_PROVIDER = {
@@ -139,7 +140,7 @@ DATABASES = {
         # 'PORT': '3306',
         # 'PASSWORD': 'patazone123',
 
-        'NAME': 'patazonedb',
+        'NAME': 'admin_patazone',
         'USER': 'root',
         'HOST': '127.0.0.1',
         'PORT': '3306',

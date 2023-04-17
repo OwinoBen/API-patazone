@@ -53,8 +53,8 @@ class Brands(models.Model):
         return str(self.brand_id)
 
 
-class ProductModel(models.Model):
-    product_id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4())
+class Product(models.Model):
+    product_id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4())
     product_title = models.CharField(max_length=255)
     shop_name = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True, null=True, unique=True)
@@ -92,7 +92,7 @@ class ProductModel(models.Model):
 
 
 class ProductImages(models.Model):
-    product = models.ForeignKey(ProductModel, on_delete=models.CASCADE, related_name="images")
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     img = models.ImageField(upload_to=imagePath, default="", null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)
 

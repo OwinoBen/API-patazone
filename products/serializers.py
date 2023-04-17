@@ -2,7 +2,7 @@ from django.utils.text import slugify
 from rest_framework import serializers, status
 from rest_framework.response import Response
 
-from products.models import PtzProducts, PtzMultipleimgs, PtzBrands, PtzMainslidersettings, ProductModel, ProductImages
+from products.models import PtzProducts, PtzMultipleimgs, PtzBrands, PtzMainslidersettings, Product, ProductImages
 
 
 class productGallerySerializer(serializers.ModelSerializer):
@@ -29,10 +29,11 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductSerializers(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     uploaded_images = serializers.ListField(
+
         child=serializers.ImageField(max_length=1000000, allow_empty_file=False, use_url=False), write_only=True, )
 
     class Meta:
-        model = ProductModel
+        model = Product
         fields = ("product_id", "product_title", "shop_name", "slug", "brand", "category", "subcategory",
                   "subsubcategory", "product_tags", "product_sku", "product_qty", "selling_price", "discount_price",
                   "variation", "barcode", "product_thumbnail", "hot_deals", "featured",
@@ -46,14 +47,14 @@ class ProductSerializers(serializers.ModelSerializer):
         slug = slugify(validated_data['product_title'])
 
         try:
-            products = ProductModel.objects.get(slug=slug)
+            products = Product.objects.get(slug=slug)
             if products:
                 # return Response()
                 raise serializers.ValidationError({'success': 0, "code": status.HTTP_400_BAD_REQUEST,
                                                    'message': 'The product with the title already exists'})
-        except ProductModel.DoesNotExist:
+        except Product.DoesNotExist:
             # get the rest of the body fields and save them to the database
-            product = ProductModel.objects.create(**validated_data)
+            product = Product.objects.create(**validated_data)
 
             for img in uploaded_images:
                 ProductImages.objects.create(product=product, img=img)

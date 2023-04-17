@@ -16,7 +16,7 @@ from rest_framework.viewsets import ModelViewSet
 from utils.messages.hundle_messages import successResponse, errorResponse
 
 from products.models import PtzProducts, PtzMultipleimgs, \
-    PtzMainslidersettings, PtzBrands, ProductModel
+    PtzMainslidersettings, PtzBrands, Product
 from products.serializers import ProductSerializer, \
     productGallerySerializer, BannerSliderSerializer, BrandSeializer, ProductSerializers
 
@@ -71,7 +71,7 @@ def deleteProducts(request):
 
 
 class ProductsViewSet(ModelViewSet):
-    queryset = ProductModel.objects.all().order_by('-created_date', '-pk')
+    queryset = Product.objects.all().order_by('-created_date', '-pk')
     permission_classes = [IsAuthenticatedOrReadOnly]
     serializer_class = ProductSerializers
     parser_classes = (MultiPartParser, FormParser)

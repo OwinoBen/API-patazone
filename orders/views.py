@@ -1,13 +1,18 @@
 import random
 
 import requests
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.filters import SearchFilter, OrderingFilter
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.viewsets import ModelViewSet
 
-from orders.models import PtzOrders, PtzCart
-from orders.serializers import OrderSerializer, CartSerializer
+from orders.models import PtzOrders, PtzCart, Orders
+from orders.serializers import OrderSerializer, CartSerializer, OrderSerializers
 
 
 @api_view(['POST', ])
@@ -62,7 +67,6 @@ def placeOrder(request):
                         if serializers.is_valid():
                             serializers.save()
                         else:
-                            print(serializers.errors)
                             return Response({"message": serializers.errors}, status=status.HTTP_400_BAD_REQUEST)
                     sendSMS(phone, order_id)
                     return Response({"order_id": order_id, "message": "Order placed successfully"},
@@ -97,6 +101,17 @@ def placeOrder(request):
             else:
                 return Response({"message": "Payment method not available now, you can use cash option instead"},
                                 status=status.HTTP_400_BAD_REQUEST)
+
+
+class OrderView(ModelViewSet):
+    queryset = Orders.objects.all()
+    serializer_class = OrderSerializers
+    pagination_class = PageNumberPagination
+    # parser_classes = (MultiPartParser, FormParser)
+
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ('^order_id', '^amount_paid', '^status', 'received')
+    ordering_fields = ['order_id']
 
 
 @api_view(['GET', ])
