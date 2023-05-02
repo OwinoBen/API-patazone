@@ -1,6 +1,10 @@
 from django.urls import path, include
-
 from auth_apps import views
+
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView,
+)
 
 app_name = 'auth_apps'
 
@@ -10,9 +14,10 @@ urlpatterns = [
     path('logout', views.logoutUser, name="logout"),
     path('update-account', views.update_account_view, name="update-account"),
     path('list-users', views.account_property_view, name="list-users"),
-    path('oauthlogin', views.user_login),
-    path('registeruser', views.TokenView.as_view()),
-    path('reg', views.RefreshToken.as_view()),
     path('account/delete-user', views.CloseUserAccount, name="close-account"),
-    path('social-auth/', include('socialAuth.urls'))
+    path('social-auth/', include('socialAuth.urls')),
+
+    path('social', views.UserRegistrationView.as_view()),
+    path('signin', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]

@@ -13,5 +13,6 @@ urlpatterns = [
     path('v1/orders/', include('orders.urls')),
     path('v1/categories/', include('categories.urls')),
     path('customer/address/add', views.saveCustomerAddress, name="add-address"),
-    path('customer/address/list', views.getAddressList, name="address-list")
+    path('customer/address/list', views.getAddressList, name="address-list"),
+    path('dashboard', include('dashboard.urls'))
 ]

@@ -10,23 +10,32 @@ from django.db import transaction
 from django.shortcuts import render
 
 # Create your views here.
-from oauth2_provider.models import AccessToken, Application, RefreshToken
+from oauth2_provider.models import AccessToken, Application
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views.mixins import OAuthLibMixin
-from rest_framework import status, permissions
+from rest_framework import status, permissions, serializers
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.exceptions import ValidationError, AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.views import TokenObtainPairView
+from rest_framework_simplejwt.tokens import RefreshToken
 
 from .models import PtzAccountUsers, Account
-from .serializer import UserSerializer, RegistrationSerializer, AccountPropertiesSerializer, RegisterSerializer
+from .serializer import UserSerializer, RegistrationSerializer, AccountPropertiesSerializer, RegisterSerializer, \
+    RegistrationSerializers
+
+
+class UserRegistrationView(TokenObtainPairView):
+    queryset = Account.objects.all()
+    serializer_class = RegistrationSerializers
 
 
 @api_view(['POST'])
-@permission_classes([AllowAny])
 def registration_view(request):
     if request.method == 'POST':
         serializer = RegistrationSerializer(data=request.data)
@@ -168,7 +177,8 @@ def user_login(request):
                     contex['access_token'] = token
                 else:
                     if not Application.objects.filter(user=1).exists():
-                        Application.objects.create(user_id=6, authorization_grant_type='cre', client_type='confidential')
+                        Application.objects.create(user_id=6, authorization_grant_type='cre',
+                                                   client_type='confidential')
                     app_obj = Application.objects.filter(user=6)
                     if app_obj:
                         app_obj = app_obj[0]
@@ -178,7 +188,7 @@ def user_login(request):
                         url = 'http://' + request.get_host() + '/o/token/'
                         data_dict = {"grant_type": "password", "username": username, "password": password,
                                      "client_id": client_id, "client_secret": client_secret}
-                        print(">>>>>>>data_dict>>>>>>", data_dict)
+
                         aa = requests.post(url, data=data_dict)
                         print(">>>>>>>>>>>", request.get_host())
                         data = aa.json()

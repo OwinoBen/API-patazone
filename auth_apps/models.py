@@ -14,10 +14,8 @@ AUTH_PROVIDERS = {
 
 class apiAccount(BaseUserManager):
     def create_user(self, email, password, firstname, lastname, phone, auth_provider=AUTH_PROVIDERS.get('email')):
-        if not email:
-            raise ValueError('Users must have an email address')
-        # if not username:
-        #     raise ValueError('Username is required')
+        if not email or not self.normalize_email(email):
+            raise ValueError('Users must have a valid email address')
         if not firstname:
             raise ValueError('Firstname is required')
         if not lastname:
@@ -56,7 +54,7 @@ class apiAccount(BaseUserManager):
 
 class Account(AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
-    # username = models.CharField(max_length=30, unique=True)
+    username = None
     firstname = models.CharField(max_length=30, null=True, blank=True)
     lastname = models.CharField(max_length=30, null=True, blank=True)
     phone = models.CharField(max_length=30, null=True, blank=True)

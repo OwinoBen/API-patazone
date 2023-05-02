@@ -13,6 +13,7 @@ from rest_framework.viewsets import ModelViewSet
 
 from orders.models import PtzOrders, PtzCart, Orders
 from orders.serializers import OrderSerializer, CartSerializer, OrderSerializers
+from utils.messages.hundle_messages import successResponse, errorResponse
 
 
 @api_view(['POST', ])
@@ -112,6 +113,65 @@ class OrderView(ModelViewSet):
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ('^order_id', '^amount_paid', '^status', 'received')
     ordering_fields = ['order_id']
+
+    def retrieve(self, request, *args, **kwargs):
+        """
+        Fetch order by the orderID
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+        response_data = successResponse(status_code=status.HTTP_200_OK, message_code="get_data", message={"data": data})
+        return Response(data=response_data)
+
+    def update(self, request, *args, **kwargs):
+        """
+            Modify orders details
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        instance = self.get_object()
+        if not instance:
+            response_data = errorResponse(status_code=status.HTTP_400_BAD_REQUEST, error_code="not_found", message="Resource not found")
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(instance, many=isinstance(request.data, list), partial=True, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.update(instance, request.data)
+        data = successResponse(status_code=status.HTTP_200_OK,
+                               message_code="update_success",
+                               message=f"{instance} updated successfully")
+        headers = self.get_success_headers(serializer.data)
+        return Response(data=data, status=status.HTTP_200_OK, headers=headers)
+
+    def destroy(self, request, *args, **kwargs):
+        """
+        Delete order from the database
+        :param request:
+        :param args:
+        :param kwargs:
+        :return:
+        """
+        if not (not request.user.is_superuser and not request.user.is_admin):
+            instance = self.get_object()
+
+            self.perform_destroy(instance)
+            response_data = successResponse(status_code=status.HTTP_204_NO_CONTENT,
+                                            message_code="delete_success",
+                                            message=f"{instance} deleted successfully.")
+
+            return Response(data=response_data, status=status.HTTP_204_NO_CONTENT)
+        else:
+            response_data = errorResponse(status_code=status.HTTP_403_FORBIDDEN, error_code="permission_denied",
+                                          message="You have no permission to delete the resource. Contact "
+                                                  "system admin to grant permission.")
+
+            return Response(data=response_data, status=status.HTTP_403_FORBIDDEN)
 
 
 @api_view(['GET', ])

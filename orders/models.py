@@ -16,7 +16,7 @@ from products.models import PtzProducts, Product
 
 # Create your models here.
 
-class OrderManagementQuerySet(models.query.QuerySet):
+class OrderManagementQuerySet(models.QuerySet):
     def recentOrders(self):
         return self.order_by('-updated_at', '-created_at')
 
@@ -56,7 +56,7 @@ class OrderManagementQuerySet(models.query.QuerySet):
     def getOrderByRange(self, start_date, end_date=None):
         if end_date is None:
             return self.filter(updated_at__gte=start_date)
-        return self.filter(updated_at__=start_date).filter(updated_at__lte=end_date)
+        return self.filter(updated_at__gte=start_date).filter(updated_at__lte=end_date)
 
     def getOrderByDate(self):
         now = timezone.now() - datetime.timedelta(days=9)
@@ -67,9 +67,9 @@ class OrderManagementQuerySet(models.query.QuerySet):
 
     def getCartData(self):
         return self.aggregate(
-            Sum("cart__product__price"),
-            Avg("cart__product__price"),
-            Count("cart__product")
+            Sum("items__product__discount_price"),
+            Avg("items__product__discount_price"),
+            Count("items__product")
         )
 
     def getOrderByStatus(self, status='shipped'):
@@ -88,7 +88,16 @@ class OrderManager(models.Manager):
         return self.model.objects.create(user=user_object)
 
     def get_queryset(self):
-        return OrderManager(self.model, using=self._db)
+        return OrderManagementQuerySet(self.model, using=self._db)
+
+    def getSells_breakdown(self):
+        return self.get_queryset().getSells_breakdown()
+
+    def getOrderByRange(self, start_date, end_date=None):
+        return self.get_queryset().getOrderByRange(start_date, end_date)
+
+    def getOrdersByWeeksRange(self, weeks_ago, number_of_weeks):
+        return self.get_queryset().getOrdersByWeeksRange(weeks_ago=weeks_ago, number_of_weeks=number_of_weeks)
 
 
 class Coupon(models.Model):
@@ -105,10 +114,11 @@ class Orders(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user')
     payment = models.CharField(max_length=255, blank=True, null=True)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, blank=True, null=True)
-    amount_paid = models.CharField(max_length=255, blank=True, null=True)
+    amount_paid = models.FloatField(default=0.00, blank=True, null=True)
     total_amount = models.FloatField(default=0.00)
     # cart = models.ManyToManyField(OrderItems)
-    shipping_address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='shipping_address', null=True,blank=True)
+    shipping_address = models.ForeignKey(Address, on_delete=models.CASCADE, related_name='shipping_address', null=True,
+                                         blank=True)
     status = models.CharField(max_length=120, default='ordered')
     ordered = models.BooleanField(default=False)
     received = models.BooleanField(default=False)
@@ -122,14 +132,14 @@ class Orders(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     soft_delete = models.BooleanField(default=False)
 
-    object = OrderManager
+    objects = OrderManager()
 
     def __str__(self):
         return self.order_id
 
-    @property
-    def items(self):
-        return self.items.set.all()
+    # @property
+    # def items(self):
+    #     return self.items.set.all()
 
     def save(self, *args, **kwargs):
         orderId = 'PTZORD' + str(random.randint(1, 1000000))
@@ -138,20 +148,20 @@ class Orders(models.Model):
 
     def subTotal(self):
         subtotal = 0
-        for ordersItem in self.cart.all():
+        for ordersItem in self.items.all():
             subtotal += ordersItem.getTotalItemPrice()
         return subtotal
 
     def getTotal(self):
         total = 0
-        for item in self.cart.all():
+        for item in self.items.all():
             total += item.getFinalOrderAmount()
         if self.coupon:
             total -= self.coupon.amount
         return total
 
     def getAbsoluteUrl(self):
-        return reverse("orders:detail", kwargs={'order_id': self.order_id})
+        return reverse("order:detail", kwargs={'order_id': self.order_id})
 
     def getStatus(self) -> str:
         if self.status == 'refunded':
@@ -161,7 +171,7 @@ class Orders(models.Model):
         return 'Shipping soon'
 
     def update_total(self):
-        cart_total = self.cart.total
+        cart_total = self.getTotal()
         shipping_total = self.shipping_total
         new_total = math.fsum([cart_total, shipping_total])
         formatted_total = format(new_total, '.2f')
@@ -170,7 +180,7 @@ class Orders(models.Model):
         return new_total
 
     def update_purchased_product(self):
-        for item in self.cart.all():
+        for item in self.items.all():
             bj, created = PurchesedProducts.objects.get_or_create(
                 order=self.order_id,
                 product=item
@@ -197,6 +207,10 @@ class OrderItems(models.Model):
 
     def __str__(self):
         return f"{self.quantity} of {self.product.product_title}"
+
+    def save(self, *args, **kwargs):
+        self.order.total_amount = self.getFinalOrderAmount()
+        super().save(*args, **kwargs)
 
     def getTotalItemPrice(self) -> float:
         return self.quantity * self.product.selling_price

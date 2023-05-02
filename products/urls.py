@@ -9,7 +9,7 @@ from rest_framework import routers
 
 app_name = 'products'
 
-router = routers.DefaultRouter()
+router = routers.DefaultRouter(trailing_slash=False)
 
 router.register('product', ProductsViewSet)
 

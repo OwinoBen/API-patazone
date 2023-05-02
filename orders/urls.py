@@ -4,7 +4,7 @@ from rest_framework import routers
 
 app_name = 'orders'
 
-router = routers.DefaultRouter()
+router = routers.DefaultRouter(trailing_slash=False)
 router.register('order', views.OrderView)
 
 urlpatterns = [
