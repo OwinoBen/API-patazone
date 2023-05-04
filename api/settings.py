@@ -51,6 +51,9 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
+    'drf_yasg',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
 
     'apiV1',
     'auth_apps',
@@ -82,12 +85,24 @@ REST_FRAMEWORK = {
     'PAGE_SIZE': 24,
 
     # 'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
-    'EXCEPTION_HANDLER': 'utils.errors.exceptionhandler.customExceptionHandler'
+    'EXCEPTION_HANDLER': 'utils.errors.exceptionhandler.customExceptionHandler',
 
-    # 'DEFAULT_PERMISSION_CLASSES': [
-    #     'rest_framework.permissions.IsAuthenticated',
-    # ]
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Ecommerce Api Documentation',
+    'DESCRIPTION': 'Welcome to the Ecommerce API reference! It contains a guide on how to integrate to our API and '
+                   'outlines important information to assist you through the integration process. The API is a REST '
+                   'API over HTTP using JSON as the exchange format. It uses standard HTTP response codes, '
+                   'authentication, and verbs.',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'SWAGGER_UI_DIST': 'SIDECAR',  # shorthand to use the sidecar instead
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    # OTHER SETTINGS
 }
 
 SIMPLE_JWT = {

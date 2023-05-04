@@ -1,8 +1,22 @@
 from django.contrib import admin
 
 # Register your models here.
-from apiV1.models import PtzCategories, PtzSubcategories, PtzSubsubcategories
+from django.contrib.auth.admin import UserAdmin
 
-# admin.site.register(PtzCategories)
-admin.site.register(PtzSubcategories)
-admin.site.register(PtzSubsubcategories)
+from .models import Categories, Subcategories, SubsubCategories
+
+
+class CategoriesView(UserAdmin):
+    list_display = ('id', 'category_name','category_thumbnail', 'date_created')
+    search_fields = ('category_name',)
+    readonly_fields = ('date_created', )
+
+    filter_horizontal = ()
+    list_filter = ()
+    fieldsets = ()
+    ordering = ()
+
+
+admin.site.register(Categories, CategoriesView)
+admin.site.register(Subcategories)
+admin.site.register(SubsubCategories)

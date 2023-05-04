@@ -7,7 +7,8 @@ import random
 # Create your models here.
 from django.utils.text import slugify
 
-from apiV1.models import PtzCategories, Categories, SubsubCategories, Subcategories
+from categories.models import Categories, SubsubCategories, Subcategories
+from apiV1.models import PtzCategories
 
 
 def get_filename_ext(filepath):
