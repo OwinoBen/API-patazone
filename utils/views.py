@@ -1,3 +1,7 @@
+"""
+Function for displaying error 404 and 500 views
+"""
+
 from django.http import JsonResponse
 from utils.messages.hundle_messages import errorResponse
 
