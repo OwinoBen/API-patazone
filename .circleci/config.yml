@@ -11,7 +11,7 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           name: lint
-          command: pylint static/media static/media_organizer/
+          command: pylint --recursive=y static/media static/media_organizer/
       - run:
           name: run tests
           command: python manage.py test
