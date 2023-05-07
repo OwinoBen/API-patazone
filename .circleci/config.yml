@@ -15,7 +15,7 @@ jobs:
       - run:
           name: run tests
           command: python manage.py test
-workflows:s
+workflows:
   build-and-test-workflow:
     jobs:
       - test-and-lint
