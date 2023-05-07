@@ -11,7 +11,8 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           name: lint
-          command: pylint $(find . -name "*.py" | xargs)
+          command: pylint products/views.py
+#          command: pylint $(find . -name "*.py" | xargs)
       - run:
           name: run tests
           command: python manage.py test

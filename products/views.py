@@ -9,7 +9,8 @@ from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.parsers import MultiPartParser, FormParser
-from rest_framework.permissions import AllowAny, IsAuthenticated, IsAdminUser, IsAuthenticatedOrReadOnly
+from rest_framework.permissions import AllowAny, IsAuthenticated, \
+    IsAuthenticatedOrReadOnly
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
@@ -85,13 +86,12 @@ class ProductsViewSet(ModelViewSet):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
         data = serializer.data
-        response_data = successResponse(status_code=status.HTTP_200_OK, message_code="get_data", message={"data": data})
+        response_data = successResponse(status_code=status.HTTP_200_OK,
+                                        message_code="get_data", message={"data": data})
         return Response(data=response_data)
 
     def create(self, request, *args, **kwargs):
         """Create products and multiple images referenced to the product"""
-
-        # serializers = self.serializer_class(data=request.data)
 
         if request.user.is_admin or request.user.is_staff or request.user.is_vendor or request.user.is_superuser:
             serializer = self.get_serializer(data=request.data)
@@ -107,7 +107,8 @@ class ProductsViewSet(ModelViewSet):
 
             return Response(data=response_data, status=status.HTTP_201_CREATED, headers=headers)
         else:
-            response_data = errorResponse(status_code=status.HTTP_403_FORBIDDEN, error_code="permission_denied", message="Permission to access the resource denied. Contact system admin.")
+            response_data = errorResponse(status_code=status.HTTP_403_FORBIDDEN, error_code="permission_denied",
+                                          message="Permission to access the resource denied. Contact system admin.")
 
             return Response(data=response_data, status=status.HTTP_403_FORBIDDEN)
 
