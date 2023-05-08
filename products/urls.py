@@ -36,6 +36,4 @@ urlpatterns = [
     path('products/brands-products/<brand_id>', views.getProductsByBrands,
          name="brands-product"),
 
-    # path("all-products", include(product_router.urls))
-    path('all-products', views.ProductsViewSet)
 ]

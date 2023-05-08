@@ -1,32 +1,27 @@
 import json
 
-import requests
+# import requests
 from braces.views import CsrfExemptMixin
 from django.contrib.auth import logout, authenticate, login
 from django.contrib.auth.hashers import check_password
-from datetime import datetime
 
 from django.db import transaction
-from django.shortcuts import render
 
 # Create your views here.
 from oauth2_provider.models import AccessToken, Application
 from oauth2_provider.settings import oauth2_settings
 from oauth2_provider.views.mixins import OAuthLibMixin
-from rest_framework import status, permissions, serializers
+from rest_framework import status, permissions
 from rest_framework.authtoken.models import Token
-from rest_framework.decorators import api_view, permission_classes, action
-from rest_framework.exceptions import ValidationError, AuthenticationFailed
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView
-from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import PtzAccountUsers, Account
-from .serializer import UserSerializer, RegistrationSerializer, AccountPropertiesSerializer, RegisterSerializer, \
+from .models import Account
+from .serializer import RegistrationSerializer, AccountPropertiesSerializer, RegisterSerializer, \
     RegistrationSerializers
 
 
@@ -148,66 +143,66 @@ def login_user(request):
 
 
 # user login with OAuth2 authentiation
-@api_view(['POST'])
-def user_login(request):
-    """
-    user_login method define to check current user is authorised or not
-    :param request:
-    :return:
-    """
-
-    if request.method == 'POST':
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        user = authenticate(username=username, password=password)
-        if user:
-            if user.is_active:
-                print(">>>>>>>>>>>>>>>>>>", user.is_active)
-                login(request, user)
-                token = ''
-                time_threshold = datetime.now()
-                token_obj = AccessToken.objects.filter(user=user, expires__gt=time_threshold)
-                contex = {}
-                if token_obj:
-                    token_obj = token_obj[0]
-                    token = token_obj.token
-                    contex['id'] = user.id
-                    contex['username'] = username
-                    contex['access_token'] = token
-                else:
-                    if not Application.objects.filter(user=1).exists():
-                        Application.objects.create(user_id=6, authorization_grant_type='cre',
-                                                   client_type='confidential')
-                    app_obj = Application.objects.filter(user=6)
-                    if app_obj:
-                        app_obj = app_obj[0]
-                        print(">>>>>>>>>>>>>", app_obj)
-                        client_id = app_obj.client_id
-                        client_secret = app_obj.client_secret
-                        url = 'http://' + request.get_host() + '/o/token/'
-                        data_dict = {"grant_type": "password", "username": username, "password": password,
-                                     "client_id": client_id, "client_secret": client_secret}
-
-                        aa = requests.post(url, data=data_dict)
-                        print(">>>>>>>>>>>", request.get_host())
-                        data = aa.json()
-                        print(">>>>>>>data>>>>", data)
-                        token = data.get('access_token', '')
-                    print(">>>>>>token>>>>>>", token)
-                    contex['id'] = user.id
-                    contex['username'] = username
-                    contex['access_token'] = token
-                return Response(contex)
-            else:
-                error_msg = "your account was inactive."
-                return Response({'error': error_msg}, status=status.HTTP_408_REQUEST_TIMEOUT)
-            return Response({'eror': 'error occured'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            error_msg = "wrong username or password, please try again with correct credentials"
-            return Response({"error": error_msg}, status=status.HTTP_401_UNAUTHORIZED)
-    else:
-        return Response({'eror': 'error occured'}, status=status.HTTP_400_BAD_REQUEST)
+# @api_view(['POST'])
+# def user_login(request):
+#     """
+#     user_login method define to check current user is authorised or not
+#     :param request:
+#     :return:
+#     """
+#
+#     if request.method == 'POST':
+#         username = request.POST.get('username')
+#         password = request.POST.get('password')
+#
+#         user = authenticate(username=username, password=password)
+#         if user:
+#             if user.is_active:
+#                 print(">>>>>>>>>>>>>>>>>>", user.is_active)
+#                 login(request, user)
+#                 token = ''
+#                 time_threshold = datetime.now()
+#                 token_obj = AccessToken.objects.filter(user=user, expires__gt=time_threshold)
+#                 contex = {}
+#                 if token_obj:
+#                     token_obj = token_obj[0]
+#                     token = token_obj.token
+#                     contex['id'] = user.id
+#                     contex['username'] = username
+#                     contex['access_token'] = token
+#                 else:
+#                     if not Application.objects.filter(user=1).exists():
+#                         Application.objects.create(user_id=6, authorization_grant_type='cre',
+#                                                    client_type='confidential')
+#                     app_obj = Application.objects.filter(user=6)
+#                     if app_obj:
+#                         app_obj = app_obj[0]
+#                         print(">>>>>>>>>>>>>", app_obj)
+#                         client_id = app_obj.client_id
+#                         client_secret = app_obj.client_secret
+#                         url = 'http://' + request.get_host() + '/o/token/'
+#                         data_dict = {"grant_type": "password", "username": username, "password": password,
+#                                      "client_id": client_id, "client_secret": client_secret}
+#
+#                         aa = requests.post(url, data=data_dict)
+#                         print(">>>>>>>>>>>", request.get_host())
+#                         data = aa.json()
+#                         print(">>>>>>>data>>>>", data)
+#                         token = data.get('access_token', '')
+#                     print(">>>>>>token>>>>>>", token)
+#                     contex['id'] = user.id
+#                     contex['username'] = username
+#                     contex['access_token'] = token
+#                 return Response(contex)
+#             else:
+#                 error_msg = "your account was inactive."
+#                 return Response({'error': error_msg}, status=status.HTTP_408_REQUEST_TIMEOUT)
+#             return Response({'eror': 'error occured'}, status=status.HTTP_400_BAD_REQUEST)
+#         else:
+#             error_msg = "wrong username or password, please try again with correct credentials"
+#             return Response({"error": error_msg}, status=status.HTTP_401_UNAUTHORIZED)
+#     else:
+#         return Response({'eror': 'error occured'}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -218,26 +213,26 @@ def logoutUser(request):
     return Response('User Logged out successfully')
 
 
-class RefreshToken(APIView):
-    def post(self, request):
-        data = request.data
-        print(data)
-        user_id = data['user_id']
-        client_id = data['client_id']
-        client_secret = data['client_secret']
-        token_obj = RefreshToken.objects.filter(user=user_id).order_by('-id')
-        refresh_token = ''
-        if token_obj:
-            token_obj = token_obj[0]
-            refresh_token = token_obj.token
-            url = 'http://' + request.get_host() + '/o/token/'
-            data_dict = {"grant_type": "refresh_token", "client_id": client_id, "client_secret": client_secret,
-                         "refresh_token": refresh_token}
-            print(">>>>>>>data_dict>>>>>>", data_dict)
-            aa = requests.post(url, data=data_dict)
-            print(">>>>>>>>>>>", request.get_host())
-            data = aa.json()
-            return Response(data, status=status.HTTP_201_CREATED)
+# class RefreshToken(APIView):
+#     def post(self, request):
+#         data = request.data
+#         print(data)
+#         user_id = data['user_id']
+#         client_id = data['client_id']
+#         client_secret = data['client_secret']
+#         token_obj = RefreshToken.objects.filter(user=user_id).order_by('-id')
+#         refresh_token = ''
+#         if token_obj:
+#             token_obj = token_obj[0]
+#             refresh_token = token_obj.token
+#             url = 'http://' + request.get_host() + '/o/token/'
+#             data_dict = {"grant_type": "refresh_token", "client_id": client_id, "client_secret": client_secret,
+#                          "refresh_token": refresh_token}
+#             print(">>>>>>>data_dict>>>>>>", data_dict)
+#             aa = requests.post(url, data=data_dict)
+#             print(">>>>>>>>>>>", request.get_host())
+#             data = aa.json()
+#             return Response(data, status=status.HTTP_201_CREATED)
 
 
 class UserRegister(CsrfExemptMixin, OAuthLibMixin, APIView):
