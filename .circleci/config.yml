@@ -36,4 +36,4 @@ workflows:
   build-and-test-workflow:
     jobs:
       - test-and-lint
-      - build-and-push-t-dockerhub
+      - build-and-push-to-dockerhub
