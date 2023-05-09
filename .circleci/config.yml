@@ -4,6 +4,9 @@ jobs:
   test-and-lint:
     docker:
       - image: cimg/python:3.10.1
+      - image: cimg/postgres
+        environment:
+          POSTGRES_USER: ben
     steps:
       - checkout
       - run:
@@ -16,6 +19,18 @@ jobs:
       - run:
           name: run tests
           command: python manage.py test
+  build_and_push_to_dockerhub:
+    docker:
+      - image: cimg/python:3.10.1
+      steps:
+        - checkout
+        - setup_remote_docker:
+            version: 19.03.13
+            docker_layer_catching: true
+              - run: |
+                  echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+              - run: docker build -t owinoben/Ecommerce_api:$CIRCLE_BRANCH .
+              - run: docker push owinoben/Ecommerce_api:$CIRCLE_BRANCH
 workflows:
   build-and-test-workflow:
     jobs:
