@@ -19,20 +19,21 @@ jobs:
       - run:
           name: run tests
           command: python manage.py test
-  build_and_push_to_dockerhub:
+  build-and-push-to-dockerhub:
     docker:
       - image: cimg/python:3.10.1
-      steps:
-        - checkout
-        - setup_remote_docker:
-            version: 19.03.13
-            docker_layer_catching: true
-              - run: |
-                  echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
-              - run: docker build -t owinoben/Ecommerce_api:$CIRCLE_BRANCH .
-              - run: docker push owinoben/Ecommerce_api:$CIRCLE_BRANCH
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run: docker build -t owinoben/Ecommerce_api:$CIRCLE_BRANCH .
+      - run: docker push owinoben/Ecommerce_api:$CIRCLE_BRANCH
+
 workflows:
   build-and-test-workflow:
     jobs:
       - test-and-lint
-      - build_and_push_to_dockerhub
+      - build-and-push-t-dockerhub
