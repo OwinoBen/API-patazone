@@ -88,8 +88,8 @@ workflows:
     jobs:
       - connect-to-database
       - test-and-lint:
-          - requires:
-              - connect-to-database
+          requires:
+            - connect-to-database
       - build-and-push-to-dockerhub:
           requires:
             - test-and-lint
