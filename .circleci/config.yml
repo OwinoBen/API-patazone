@@ -73,10 +73,10 @@ workflows:
     jobs:
       - connect-to-database:
           context: database
-            filters:
-              branches:
-                only:
-                  - main
+          filters:
+            branches:
+              only:
+                - main
       - test-and-lint:
           requires:
             - connect-to-database
