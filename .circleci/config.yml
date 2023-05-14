@@ -39,6 +39,10 @@ jobs:
   test-and-lint:
     docker:
       - image: cimg/python:3.10.1
+      - image: cimg/mysql:8.0
+      environment:
+        MYSQL_ROOT_PASSWORD: patazone123
+        MYSQL_DATABASE: admin_patazone
     steps:
       - checkout
       - run:
