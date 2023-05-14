@@ -4,7 +4,7 @@ jobs:
   connect-to-database:
     docker:
       - image: cimg/python:3.10.1
-        - auth:
+        auth:
             username: $DOCKERHUB_USERNAME
             password: $DOCKERHUB_PASSWORD
       - image: cimg/mysql:8.0
