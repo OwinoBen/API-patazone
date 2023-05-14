@@ -12,10 +12,11 @@ jobs:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
-#          MYSQL_ROOT_PASSWORD: patazone123
+          MYSQL_ROOT_PASSWORD: patazone123
           MYSQL_DATABASE: admin_patazone
-          MYSQL_USER: root
-          MYSQL_PASSWORD: patazone123
+
+#          MYSQL_USER: root # for configuring a regular user
+#          MYSQL_PASSWORD: patazone123
     steps:
       - checkout
       - run:
