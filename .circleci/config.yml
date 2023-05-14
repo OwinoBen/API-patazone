@@ -8,6 +8,8 @@ jobs:
             username: $DOCKERHUB_USERNAME
             password: $DOCKERHUB_PASSWORD
       - image: cimg/mysql:8.0
+        cap_add:
+          - SYS_NICE
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
@@ -35,36 +37,7 @@ jobs:
       - run:
           name: Migrating to the database
           command: python manage.py migrate
-#  connect-to-database:
-#    docker:
-#      - image: cimg/python:3.10.1
-#        auth:
-#          username: $DOCKERHUB_USERNAME
-#          password: $DOCKERHUB_PASSWORD
-#      - image: cimg/mysql:8.0
-#        auth:
-#          username: $DOCKERHUB_USERNAME
-#          password: $DOCKERHUB_PASSWORD
-#        environment:
-#          MYSQL_ROOT_PASSWORD: patazone123
-#          MYSQL_DATABASE: admin_patazone
-#          MYSQL_USER: root
-#          MYSQL_PASSWORD: patazone123
-#    steps:
-#      - checkout
-#      - run:
-#          name: Waiting for MySQL to be ready
-#          command: |
-#            for i in `seq 1 10`;
-#            do
-#              nc -z 127.0.0.1 3306 && echo Success && exit 0
-#              echo -n .
-#              sleep 1
-#            done
-#            echo Failed waiting for MySQL && exit 1
-#      - run:
-#          name: Migrating to the database
-#          command: python manage.py migrate
+
   test-and-lint:
     docker:
       - image: cimg/python:3.10.1
