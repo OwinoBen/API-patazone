@@ -71,7 +71,12 @@ jobs:
 workflows:
   build-and-test-workflow:
     jobs:
-      - connect-to-database
+      - connect-to-database:
+          context: database
+            filters:
+              branches:
+                only:
+                  - main
       - test-and-lint:
           requires:
             - connect-to-database
