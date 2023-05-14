@@ -8,14 +8,14 @@ jobs:
             username: $DOCKERHUB_USERNAME
             password: $DOCKERHUB_PASSWORD
       - image: cimg/mysql:8.0
-      auth:
-        username: $DOCKERHUB_USERNAME
-        password: $DOCKERHUB_PASSWORD
-      environment:
-        MYSQL_ROOT_PASSWORD: patazone123
-        MYSQL_DATABASE: admin_patazone
-        MYSQL_USER: root
-        MYSQL_PASSWORD: patazone123
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          MYSQL_ROOT_PASSWORD: patazone123
+          MYSQL_DATABASE: admin_patazone
+          MYSQL_USER: root
+          MYSQL_PASSWORD: patazone123
     steps:
       - checkout
       - run:
