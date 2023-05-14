@@ -30,6 +30,9 @@ jobs:
             done
             echo Failed waiting for MySQL && exit 1
       - run:
+          name: Installing dependencies
+          command: pip install -r requirements.txt
+      - run:
           name: Migrating to the database
           command: python manage.py migrate
 #  connect-to-database:
