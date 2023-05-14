@@ -17,7 +17,7 @@ urlpatterns = [
     path('account/delete-user', views.CloseUserAccount, name="close-account"),
     path('social-auth/', include('socialAuth.urls')),
 
-    path('social', views.UserRegistrationView.as_view()),
-    path('signin', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('social', views.UserRegistrationView.as_view(), name='register'),
+    path('signin', TokenObtainPairView.as_view(), name='login'),
     path('token/refresh', TokenRefreshView.as_view(), name='token_refresh'),
 ]

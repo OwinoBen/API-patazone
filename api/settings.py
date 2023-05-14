@@ -34,6 +34,7 @@ ALLOWED_HOSTS = ['*']
 
 APPEND_SLASH = False  # REMOVE THE TRAILING SLASH IN URL e.g http://127.0.0.1:8000/
 
+ADMINS = [('Benson', 'bensonowinoopondo@gmail.com'), ('Owino', 'owinoben2020@ggmail.com')]
 # Application definition
 
 INSTALLED_APPS = [

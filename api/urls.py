@@ -24,7 +24,7 @@ schema_view = swagger_get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('apiV1.urls')),
+    path('api/', include('apiV1.urls', namespace='apiV1'),),
     path('o/', include('oauth2_provider.urls')),
 
     # documentation urls
