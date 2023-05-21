@@ -30,9 +30,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # DEBUG = True  # turning false to allow error 500 displayed as json
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
-# ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
-
+ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 APPEND_SLASH = False  # REMOVE THE TRAILING SLASH IN URL e.g http://127.0.0.1:8000/
 
@@ -192,18 +191,25 @@ WSGI_APPLICATION = 'api.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
+        'ENGINE': os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
+        'NAME': os.environ.get("DB_NAME"),
+        'USER': os.environ.get("DB_USER", "user"),
+        'HOST': os.environ.get("DB_HOST", "localhost"),
+        'PORT': os.environ.get("DB_PORT", "5432"),
+        'PASSWORD': os.environ.get("DB_PASSWORD", "password"),
+
+        # 'ENGINE': 'django.db.backends.mysql',
         # 'NAME': 'patazonedb',
         # 'USER': 'admin',
         # 'HOST': 'ec2-34-198-48-156.compute-1.amazonaws.com',
         # 'PORT': '3306',
         # 'PASSWORD': 'patazone123',
 
-        'NAME': 'admin_patazone',
-        'USER': 'root',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-        'PASSWORD': 'patazone123',
+        # 'NAME': 'admin_patazone',
+        # 'USER': 'root',
+        # 'HOST': '127.0.0.1',
+        # 'PORT': '3306',
+        # 'PASSWORD': 'patazone123',
     }
 
 }

@@ -1,31 +1,59 @@
 version:  '3.8'
-
 services:
   web:
-    build: ./app
+    container_name: ecommerce-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
     command: python manage.py runserver 0.0.0.0:8000
     volumes:
-      - ./app:/usr/src/app/
+      - .:/usr/src/app/
     ports:
       - "8000:8000"
     env_file:
       - ./.env
     depends_on:
       - db
+    links:
+      - db:db
+    networks:
+      - freecodecamp
+
   db:
-    image: mysql:8.0
+    image: postgres:13
+    container_name: ecommerce_db
     restart: always
-    environment:
-      MYSQL_ROOT_PASSWORD: patazone123
-      MYSQL_DATABASE: admin_patazone
-    ports:
-      - "3306:3306"
-    expose:
-      - '3306'
     volumes:
       - database-data:/var/lib/mysql/data/
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: ecommerce_db
+    ports:
+      - "5432:5432"
+    expose:
+      - "5432"
+    networks:
+      - freecodecamp
+
+#  db:
+#    image: mysql:8.0
+#    restart: always
+#    environment:
+#      MYSQL_ROOT_PASSWORD: patazone123
+#      MYSQL_DATABASE: admin_patazone
+#    ports:
+#      - "3306:3306"
+#    expose:
+#      - '3306'
+#    volumes:
+#      - database-data:/var/lib/mysql/data/
+
+
 
 volumes:
   database-data:
+networks:
+  freecodecamp:
 
 
