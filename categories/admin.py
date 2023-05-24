@@ -7,9 +7,9 @@ from .models import Categories, Subcategories, SubsubCategories
 
 
 class CategoriesView(UserAdmin):
-    list_display = ('id', 'category_name','category_thumbnail', 'date_created')
+    list_display = ('id', 'category_name', 'category_thumbnail', 'date_created')
     search_fields = ('category_name',)
-    readonly_fields = ('date_created', )
+    readonly_fields = ('date_created',)
 
     filter_horizontal = ()
     list_filter = ()
@@ -17,6 +17,6 @@ class CategoriesView(UserAdmin):
     ordering = ()
 
 
-admin.site.register(Categories, CategoriesView)
+admin.site.register(Categories)
 admin.site.register(Subcategories)
 admin.site.register(SubsubCategories)

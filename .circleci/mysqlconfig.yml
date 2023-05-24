@@ -7,15 +7,16 @@ jobs:
         auth:
             username: $DOCKERHUB_USERNAME
             password: $DOCKERHUB_PASSWORD
-      - image: cimg/postgres:14.1
+      - image: cimg/mysql:8.0
         auth:
           username: $DOCKERHUB_USERNAME
           password: $DOCKERHUB_PASSWORD
         environment:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: 123
-          POSTGRES_DB: ecommerce_db
+          MYSQL_ROOT_PASSWORD: patazone123
+          MYSQL_DATABASE: admin_patazone
 
+#          MYSQL_USER: root # for configuring a regular user
+#          MYSQL_PASSWORD: patazone123
     steps:
       - checkout
       - run:
@@ -23,11 +24,11 @@ jobs:
           command: |
             for i in `seq 1 10`;
             do
-              nc -z 127.0.0.1 5432 && echo Success && exit 0
+              nc -z 127.0.0.1 3306 && echo Success && exit 0
               echo -n .
               sleep 1
             done
-            echo Failed waiting for POSTGRESQL && exit 1
+            echo Failed waiting for MySQL && exit 1
       - run:
           name: Installing dependencies
           command: pip install -r requirements.txt
@@ -38,11 +39,10 @@ jobs:
   test-and-lint:
     docker:
       - image: cimg/python:3.10.1
-      - image: cimg/postgres:14.1
+      - image: cimg/mysql:8.0
         environment:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: 123
-          POSTGRES_DB: ecommerce_db
+          MYSQL_ROOT_PASSWORD: patazone123
+          MYSQL_DATABASE: admin_patazone
     steps:
       - checkout
       - run:
