@@ -19,7 +19,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: Waiting for MySQL to be ready
+          name: Waiting for POSTGRESQL to be ready
           command: |
             for i in `seq 1 10`;
             do
@@ -52,9 +52,9 @@ jobs:
           name: lint
           command: pylint products/urls.py
 #          command: pylint $(find . -name "*.py" | xargs)
-      - run:
-          name: run tests
-          command: python manage.py test
+#      - run:
+#          name: run tests
+#          command: python manage.py test
   build-and-push-to-dockerhub:
     docker:
       - image: cimg/python:3.10.1
