@@ -61,7 +61,7 @@ jobs:
       - run:
           name: Pushing to the docker hub
           command: |
-          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+            $DOCKERHUB_PASSWORD | docker login --username $DOCKERHUB_USERNAME --password-stdin
       - run: docker-compose -f docker-compose.prod.yml push
 
   build-and-push-to-dockerhub:
