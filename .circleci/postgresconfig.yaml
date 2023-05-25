@@ -1,0 +1,87 @@
+version: 2.1
+
+jobs:
+  connect-to-database:
+    docker:
+      - image: cimg/python:3.10.1
+        auth:
+            username: $DOCKERHUB_USERNAME
+            password: $DOCKERHUB_PASSWORD
+      - image: cimg/postgres:14.1
+        auth:
+          username: $DOCKERHUB_USERNAME
+          password: $DOCKERHUB_PASSWORD
+        environment:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: 123
+          POSTGRES_DB: ecommerce_db
+          POSTGRES_HOST: localhost
+
+    steps:
+      - checkout
+      - run:
+          name: Waiting for POSTGRESQL to be ready
+          command: |
+            for i in `seq 1 10`;
+            do
+              nc -z 127.0.0.1 5432 && echo Success && exit 0
+              echo -n .
+              sleep 1
+            done
+            echo Failed waiting for POSTGRESQL && exit 1
+      - run:
+          name: Installing dependencies
+          command: pip install -r requirements.txt
+      - run:
+          name: Migrating to the database
+          command: python manage.py migrate
+
+  test-and-lint:
+    docker:
+      - image: cimg/python:3.10.1
+      - image: cimg/postgres:14.1
+        environment:
+          POSTGRES_USER: admin
+          POSTGRES_PASSWORD: 123
+          POSTGRES_DB: ecommerce_db
+          POSTGRES_HOST: localhost
+    steps:
+      - checkout
+      - run:
+          name: install dependencies
+          command: pip install -r requirements.txt
+      - run:
+          name: lint
+          command: pylint products/urls.py
+#          command: pylint $(find . -name "*.py" | xargs)
+      - run:
+          name: run tests
+          command: python manage.py test
+  build-and-push-to-dockerhub:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run: docker build -t owinoben/ecommerce_api_project:$CIRCLE_BRANCH .
+      - run: docker push owinoben/ecommerce_api_project:$CIRCLE_BRANCH
+
+workflows:
+  build-and-test-workflow:
+    jobs:
+      - connect-to-database:
+          context: database
+          filters:
+            branches:
+              only:
+                - main
+      - test-and-lint:
+          requires:
+            - connect-to-database
+      - build-and-push-to-dockerhub:
+          requires:
+            - test-and-lint

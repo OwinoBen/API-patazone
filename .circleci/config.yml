@@ -1,50 +1,39 @@
 version: 2.1
 
 jobs:
-  connect-to-database:
+  create-docker-image:
     docker:
       - image: cimg/python:3.10.1
-        auth:
-            username: $DOCKERHUB_USERNAME
-            password: $DOCKERHUB_PASSWORD
-      - image: cimg/postgres:14.1
-        auth:
-          username: $DOCKERHUB_USERNAME
-          password: $DOCKERHUB_PASSWORD
-        environment:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: 123
-          POSTGRES_DB: ecommerce_db
-          POSTGRES_HOST: localhost
-
     steps:
       - checkout
-      - run:
-          name: Waiting for POSTGRESQL to be ready
-          command: |
-            for i in `seq 1 10`;
-            do
-              nc -z 127.0.0.1 5432 && echo Success && exit 0
-              echo -n .
-              sleep 1
-            done
-            echo Failed waiting for POSTGRESQL && exit 1
+      - restore_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
       - run:
           name: Installing dependencies
           command: pip install -r requirements.txt
+      - save_cache:
+          key: deps1-{{ .Branch }}-{{ checksum "requirements.txt" }}
+          paths:
+            - "venv"
       - run:
-          name: Migrating to the database
-          command: python manage.py migrate
-
+          name: Installing docker compose
+          environment:
+            COMPOSE_VERSION: '1.29.2'
+          command:  |
+            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run:
+          name: Setting up docker
+          command: |
+            docker-compose -f docker-compose.prod.yml up -d --build
+            
   test-and-lint:
     docker:
       - image: cimg/python:3.10.1
-      - image: cimg/postgres:14.1
-        environment:
-          POSTGRES_USER: admin
-          POSTGRES_PASSWORD: 123
-          POSTGRES_DB: ecommerce_db
-          POSTGRES_HOST: localhost
     steps:
       - checkout
       - run:
@@ -52,11 +41,11 @@ jobs:
           command: pip install -r requirements.txt
       - run:
           name: lint
-          command: pylint products/urls.py
-#          command: pylint $(find . -name "*.py" | xargs)
+          command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
       - run:
           name: run tests
-          command: python manage.py test
+          command: docker-compose -f docker-compose.prod.yml exec web python manage.py test
+
   build-and-push-to-dockerhub:
     docker:
       - image: cimg/python:3.10.1
@@ -73,15 +62,15 @@ jobs:
 workflows:
   build-and-test-workflow:
     jobs:
-      - connect-to-database:
-          context: database
+      - create-docker-image:
+          context: Docker-create
           filters:
             branches:
               only:
                 - main
       - test-and-lint:
           requires:
-            - connect-to-database
+            - create-docker-image
       - build-and-push-to-dockerhub:
           requires:
             - test-and-lint
