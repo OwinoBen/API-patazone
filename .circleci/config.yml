@@ -52,8 +52,8 @@ jobs:
           echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
       - run:
           name: Setting up docker
-          command:
-            - docker-compose -f docker-compose.prod.yml build
+          command: |
+            docker-compose -f docker-compose.prod.yml build
       - run:
           name: lint
           command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
