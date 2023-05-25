@@ -48,18 +48,18 @@ jobs:
       - setup_remote_docker:
           version: 19.03.13
           docker_layer_caching: true
+      - run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
       - run:
           name: Setting up docker
-          command: |
-            docker-compose -f docker-compose.prod.yml up -d --build
+          command:
+            - docker-compose -f docker-compose.prod.yml build
       - run:
           name: lint
           command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
       - run:
           name: run tests
           command: docker-compose -f docker-compose.prod.yml exec web python manage.py test
-      - run: |
-          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
       - run: docker-compose -f docker-compose.prod.yml push
 
   build-and-push-to-dockerhub:
