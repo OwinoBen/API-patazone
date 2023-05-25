@@ -15,6 +15,7 @@ jobs:
           POSTGRES_USER: admin
           POSTGRES_PASSWORD: 123
           POSTGRES_DB: ecommerce_db
+          POSTGRES_HOST: localhost
 
     steps:
       - checkout
@@ -43,6 +44,7 @@ jobs:
           POSTGRES_USER: admin
           POSTGRES_PASSWORD: 123
           POSTGRES_DB: ecommerce_db
+          POSTGRES_HOST: localhost
     steps:
       - checkout
       - run:
@@ -52,9 +54,9 @@ jobs:
           name: lint
           command: pylint products/urls.py
 #          command: pylint $(find . -name "*.py" | xargs)
-#      - run:
-#          name: run tests
-#          command: python manage.py test
+      - run:
+          name: run tests
+          command: python manage.py test
   build-and-push-to-dockerhub:
     docker:
       - image: cimg/python:3.10.1
