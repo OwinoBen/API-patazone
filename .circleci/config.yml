@@ -46,6 +46,10 @@ jobs:
             chmod +x ~/docker-compose
             sudo mv ~/docker-compose /usr/local/bin/docker-compose
       - run:
+          name: Setting up docker
+          command: |
+            docker-compose -f docker-compose.prod.yml up -d --build
+      - run:
           name: lint
           command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
       - run:
