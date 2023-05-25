@@ -70,10 +70,10 @@ jobs:
       - setup_remote_docker:
           version: 19.03.13
           docker_layer_caching: true
-      - run: |
-          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
-      - run: docker build -t owinoben/ecommerce_api_project:$CIRCLE_BRANCH .
-      - run: docker push owinoben/ecommerce_api_project:$CIRCLE_BRANCH
+#      - run: |
+#          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+#      - run: docker build -t owinoben/ecommerce_api_project:$CIRCLE_BRANCH .
+#      - run: docker push owinoben/ecommerce_api_project:$CIRCLE_BRANCH
 
 workflows:
   build-and-test-workflow:
