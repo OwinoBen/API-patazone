@@ -54,13 +54,13 @@ jobs:
             docker-compose --build
       - run:
           name: lint
-          command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
+          command: docker-compose  exec web pylint products/urls.py
       - run:
           name: run tests
-          command: docker-compose -f docker-compose.prod.yml exec web python manage.py test
+          command: docker-compose  exec web python manage.py test
       - run: |
           echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
-      - run: docker-compose -f docker-compose.prod.yml push
+      - run: docker-compose  push
 
   build-and-push-to-dockerhub:
     docker:
