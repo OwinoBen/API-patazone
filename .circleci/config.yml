@@ -53,7 +53,7 @@ jobs:
       - run:
           name: Setting up docker
           command: |
-            docker-compose -f docker-compose.prod.yml build
+            docker-compose -f docker-compose.prod.yml up -d --build
       - run:
           name: lint
           command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
