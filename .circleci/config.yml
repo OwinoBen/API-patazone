@@ -37,9 +37,6 @@ jobs:
     steps:
       - checkout
       - run:
-          name: install dependencies
-          command: pip install -r requirements.txt
-      - run:
           name: Initializing docker compose
           command: |
             curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
