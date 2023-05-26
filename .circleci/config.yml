@@ -57,10 +57,10 @@ jobs:
             docker tag api-patazone-web:latest "$DOCKERHUB_USERNAME"/api-patazone-web:latest
             docker tag api-patazone-db:latest "$DOCKERHUB_USERNAME"/api-patazone-db:$CIRCLE_BRANCH
             docker tag api-patazone-nginx:latest "$DOCKERHUB_USERNAME"/api-patazone-nginx:$CIRCLE_TAG
-            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:latest
-            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
-            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_TAG
-            docker pull "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
+            docker push "$DOCKERHUB_USERNAME"/api-patazone-web:latest
+            docker push "$DOCKERHUB_USERNAME"/api-patazone-db:latest:$CIRCLE_BRANCH
+            docker push "$DOCKERHUB_USERNAME"/api-patazone-nginx:$CIRCLE_TAG
+            docker pull "$DOCKERHUB_USERNAME"/api-patazone-db:$CIRCLE_BRANCH
             docker images
       - run:
           name: lint
