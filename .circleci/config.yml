@@ -54,9 +54,9 @@ jobs:
           name: Setting up docker
           command: |
             docker-compose -f docker-compose.prod.yml up -d --build
-            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:latest
-            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
-            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_TAG
+            docker tag api-patazone-web:latest "$DOCKERHUB_USERNAME"/api-patazone-web:latest
+            docker tag api-patazone-db:latest "$DOCKERHUB_USERNAME"/api-patazone-db:$CIRCLE_BRANCH
+            docker tag api-patazone-nginx:latest "$DOCKERHUB_USERNAME"/api-patazone-nginx:$CIRCLE_TAG
             docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:latest
             docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
             docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_TAG
