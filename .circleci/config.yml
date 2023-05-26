@@ -56,7 +56,7 @@ jobs:
             docker-compose -f docker-compose.prod.yml up -d --build
             docker login -u $DOCKERHUB_USERNAME -p $DOCKERHUB_PASSWORD
             docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
-            docker push project_nginx:latest
+            docker push $DOCKERHUB_USERNAME/project_nginx:latest
       - run:
           name: lint
           command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
