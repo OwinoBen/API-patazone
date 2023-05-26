@@ -54,14 +54,12 @@ jobs:
           name: Setting up docker
           command: |
             docker-compose -f docker-compose.prod.yml up -d --build
-            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:latest
-            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
-            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_TAG
-            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:latest
-            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
-            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_TAG
-            docker pull "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
-            docker images
+#            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:latest
+#            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
+#            docker tag backend-ecommerce-api:latest "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_TAG
+#            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:latest
+#            docker push "$DOCKERHUB_USERNAME"/backend-ecommerce-api:$CIRCLE_BRANCH
+            docker push project_nginx:latest
       - run:
           name: lint
           command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
