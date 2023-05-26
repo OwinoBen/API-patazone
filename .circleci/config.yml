@@ -52,10 +52,10 @@ jobs:
           command: |
             docker-compose -f docker-compose.prod.yml up -d --build
             docker tag ecommerce-backend:latest "$DOCKERHUB_USERNAME"/ecommerce-backend:latest
-            docker tag project_db "$DOCKERHUB_USERNAME"/project_db:$CIRCLE_BRANCH
+            docker tag postgres:13 "$DOCKERHUB_USERNAME"/postgres:13:$CIRCLE_BRANCH
             docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
             docker push $DOCKERHUB_USERNAME/ecommerce-backend:latest
-            docker push $DOCKERHUB_USERNAME/project_db:$CIRCLE_BRANCH
+            docker push $DOCKERHUB_USERNAME/postgres:13:$CIRCLE_BRANCH
             docker push $DOCKERHUB_USERNAME/project_nginx:latest
       - run:
           name: lint
