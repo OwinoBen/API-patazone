@@ -23,7 +23,7 @@ services:
       - freecodecamp
   db:
     image: postgres:13
-#    container_name: ecommerce_db
+    container_name: ecommerce_db
     restart: always
     volumes:
       - database-data:/var/lib/mysql/data/
