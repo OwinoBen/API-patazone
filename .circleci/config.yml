@@ -75,14 +75,35 @@ jobs:
       - run:
           name: Uploading to DockerHub
           command: |
+            docker-compose -f docker-compose.prod.yml build
             docker tag ecommerce-backend:latest "$DOCKERHUB_USERNAME"/ecommerce-backend:latest
             docker tag postgres:13 "$DOCKERHUB_USERNAME"/postgres:13
             docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
             docker push $DOCKERHUB_USERNAME/ecommerce-backend:latest
             docker push $DOCKERHUB_USERNAME/postgres:13
             docker push $DOCKERHUB_USERNAME/project_nginx:latest
-            
-
+  
+  pull-and-test-dockerhub-image:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_catching: true
+      - run: |
+          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
+      - run:
+          name: Pulling dockerhub images
+          command: |
+            docker pull $DOCKERHUB_USERNAME/ecommerce-backend:latest
+            docker pull $DOCKERHUB_USERNAME/postgres:13
+            docker pull $DOCKERHUB_USERNAME/project_nginx:latest
+            docker-compose -f docker-compose.prod.yml up -d
+      - run:
+          name: Testing DockerHub images
+          command: |
+            docker exec  -it web python manage.py test
 
 workflows:
   build-and-test-workflow:
@@ -99,3 +120,6 @@ workflows:
       - build-and-push-to-dockerhub:
           requires:
             - test-and-lint
+      - pull-and-test-dockerhub-image:
+          requires:
+            - build-and-push-to-dockerhub
