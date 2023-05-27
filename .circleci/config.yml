@@ -29,9 +29,34 @@ jobs:
       - run:
           name: Setting up docker
           command: |
-            docker-compose -f docker-compose.prod.yml up -d --build
+            docker-compose -f docker-compose.prod.yml build
             
   test-and-lint:
+    docker:
+      - image: cimg/python:3.10.1
+    steps:
+      - checkout
+      - run:
+          name: Initializing docker compose
+          command: |
+            curl -L "https://github.com/docker/compose/releases/download/${COMPOSE_VERSION}/docker-compose-$(uname -s)-$(uname -m)" -o ~/docker-compose
+            chmod +x ~/docker-compose
+            sudo mv ~/docker-compose /usr/local/bin/docker-compose
+      - setup_remote_docker:
+          version: 19.03.13
+          docker_layer_caching: true
+      - run:
+          name: Setting up docker
+          command: |
+            docker-compose -f docker-compose.prod.yml up -d --build
+      - run:
+          name: Checking code lints
+          command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
+      - run:
+          name: running tests
+          command: docker-compose -f docker-compose.prod.yml exec web python manage.py test
+
+  build-and-push-to-dockerhub:
     docker:
       - image: cimg/python:3.10.1
     steps:
@@ -48,34 +73,16 @@ jobs:
       - run: |
           echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
       - run:
-          name: Setting up docker
+          name: Uploading to DockerHub
           command: |
-            docker-compose -f docker-compose.prod.yml up -d --build
             docker tag ecommerce-backend:latest "$DOCKERHUB_USERNAME"/ecommerce-backend:latest
             docker tag postgres:13 "$DOCKERHUB_USERNAME"/postgres:13
             docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
             docker push $DOCKERHUB_USERNAME/ecommerce-backend:latest
             docker push $DOCKERHUB_USERNAME/postgres:13
             docker push $DOCKERHUB_USERNAME/project_nginx:latest
-      - run:
-          name: lint
-          command: docker-compose -f docker-compose.prod.yml exec web pylint products/urls.py
-      - run:
-          name: run tests
-          command: docker-compose -f docker-compose.prod.yml exec web python manage.py test
+            
 
-  build-and-push-to-dockerhub:
-    docker:
-      - image: cimg/python:3.10.1
-    steps:
-      - checkout
-      - setup_remote_docker:
-          version: 19.03.13
-          docker_layer_caching: true
-#      - run: |
-#          echo "$DOCKERHUB_PASSWORD" | docker login --username $DOCKERHUB_USERNAME --password-stdin
-#      - run: docker build -t owinoben/ecommerce_api_project:$CIRCLE_BRANCH .
-#      - run: docker push owinoben/ecommerce_api_project:$CIRCLE_BRANCH
 
 workflows:
   build-and-test-workflow:
