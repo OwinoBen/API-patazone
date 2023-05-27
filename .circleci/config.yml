@@ -75,7 +75,7 @@ jobs:
       - run:
           name: Uploading to DockerHub
           command: |
-            docker-compose -f docker-compose.prod.yml -up -d --build
+            docker-compose -f docker-compose.prod.yml up -d --build
             docker tag ecommerce-backend:latest "$DOCKERHUB_USERNAME"/ecommerce-backend:latest
             docker tag postgres:13 "$DOCKERHUB_USERNAME"/postgres:13
             docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
