@@ -105,7 +105,7 @@ jobs:
             docker run $DOCKERHUB_USERNAME/ecommerce-backend:latest
             docker run $DOCKERHUB_USERNAME/postgres:13
             docker run $DOCKERHUB_USERNAME/project_nginx:latest
-            docker exec  -it web python manage.py test
+            docker exec -it web python manage.py test
 
 workflows:
   build-and-test-workflow:

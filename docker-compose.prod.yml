@@ -27,8 +27,12 @@ services:
     restart: always
     volumes:
       - database-data:/var/lib/mysql/data/
-    env_file:
-      - ./.env.prod.db
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: ecommerce_db
+#    env_file:
+#      - ./.env.prod.db
     ports:
       - "5432:5432"
     expose:
