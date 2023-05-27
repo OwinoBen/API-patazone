@@ -99,10 +99,12 @@ jobs:
             docker pull $DOCKERHUB_USERNAME/ecommerce-backend:latest
             docker pull $DOCKERHUB_USERNAME/postgres:13
             docker pull $DOCKERHUB_USERNAME/project_nginx:latest
-            docker-compose -f docker-compose.prod.yml up -d
       - run:
           name: Testing DockerHub images
           command: |
+            docker run $DOCKERHUB_USERNAME/ecommerce-backend:latest
+            docker run $DOCKERHUB_USERNAME/postgres:13
+            docker run $DOCKERHUB_USERNAME/project_nginx:latest
             docker exec  -it web python manage.py test
 
 workflows:
