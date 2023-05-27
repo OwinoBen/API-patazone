@@ -103,7 +103,7 @@ jobs:
           name: Testing DockerHub images
           command: |
             docker run $DOCKERHUB_USERNAME/ecommerce-backend:latest
-            docker run $DOCKERHUB_USERNAME/postgres:13
+            docker run -e POSTGRES_PASSWORD=123 $DOCKERHUB_USERNAME/postgres:13
             docker run $DOCKERHUB_USERNAME/project_nginx:latest
             docker exec -it web python manage.py test
 
