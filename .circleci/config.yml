@@ -104,7 +104,7 @@ jobs:
           no_output_timeout: 30m
           command: |
             docker-compose -f docker-compose.prod.yml up -d
-            docker exec -it web python manage.py test
+            docker exec -it ecommerce-api python manage.py test
 
 workflows:
   build-and-test-workflow:
