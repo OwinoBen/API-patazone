@@ -79,9 +79,9 @@ jobs:
             docker tag ecommerce-backend:latest "$DOCKERHUB_USERNAME"/ecommerce-backend:latest
             docker tag postgres:13 "$DOCKERHUB_USERNAME"/postgres:13
             docker tag project_nginx:latest "$DOCKERHUB_USERNAME"/project_nginx:latest
-            docker-compose -f docker-compose.prod.yml push $DOCKERHUB_USERNAME/ecommerce-backend:latest
-            docker-compose -f docker-compose.prod.yml push $DOCKERHUB_USERNAME/postgres:13
-            docker-compose -f docker-compose.prod.yml push $DOCKERHUB_USERNAME/project_nginx:latest
+            docker push $DOCKERHUB_USERNAME/ecommerce-backend:latest
+            docker push $DOCKERHUB_USERNAME/postgres:13
+            docker push $DOCKERHUB_USERNAME/project_nginx:latest
   
   pull-and-test-dockerhub-image:
     docker:
@@ -96,16 +96,14 @@ jobs:
       - run:
           name: Pulling dockerhub images
           command: |
-            docker-compose -f docker-compose.prod.yml pull $DOCKERHUB_USERNAME/ecommerce-backend:latest
-            docker-compose -f docker-compose.prod.yml pull $DOCKERHUB_USERNAME/postgres:13
-            docker-compose -f docker-compose.prod.yml pull $DOCKERHUB_USERNAME/project_nginx:latest
+            docker pull $DOCKERHUB_USERNAME/ecommerce-backend:latest
+            docker pull $DOCKERHUB_USERNAME/postgres:13
+            docker pull $DOCKERHUB_USERNAME/project_nginx:latest
       - run:
           name: Testing DockerHub images
           no_output_timeout: 30m
           command: |
-            docker run -itd --network=freecodecamp $DOCKERHUB_USERNAME/ecommerce-backend:latest
-            docker run -itd --network=freecodecamp -e POSTGRES_PASSWORD=123 $DOCKERHUB_USERNAME/postgres:13
-            docker run -itd --network=freecodecamp $DOCKERHUB_USERNAME/project_nginx:latest
+            docker-compose -f docker-compose.prod.yml up -d
             docker exec -it web python manage.py test
 
 workflows:
