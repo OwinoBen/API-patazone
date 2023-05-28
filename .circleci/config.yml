@@ -101,10 +101,11 @@ jobs:
             docker pull $DOCKERHUB_USERNAME/project_nginx:latest
       - run:
           name: Testing DockerHub images
+          no_output_timeout: 30m
           command: |
-            docker run $DOCKERHUB_USERNAME/ecommerce-backend:latest
-            docker run -e POSTGRES_PASSWORD=123 $DOCKERHUB_USERNAME/postgres:13
-            docker run $DOCKERHUB_USERNAME/project_nginx:latest
+            docker run -itd --network=freecodecamp $DOCKERHUB_USERNAME/ecommerce-backend:latest
+            docker run -itd --network=freecodecamp -e POSTGRES_PASSWORD=123 $DOCKERHUB_USERNAME/postgres:13
+            docker run -itd --network=freecodecamp $DOCKERHUB_USERNAME/project_nginx:latest
             docker exec -it web python manage.py test
 
 workflows:
