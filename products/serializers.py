@@ -17,11 +17,23 @@ class ProductSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("product_id", "product_title", "vendor", "slug", "brand", "category", "subcategory",
-                  "subsubcategory", "meta_title", "product_sku", "product_qty", "selling_price", "discount_price",
-                  "variation", "barcode", "product_thumbnail", "hot_deals", "featured",
-                  "recommended", "short_description", "product_specification", "long_description", "is_verified",
-                  "created_date", "updated_date", "images", "uploaded_images"
+        fields = ("product_id", "product_title",
+                  "vendor", "slug", "brand", "category", "subcategory",
+                  "subsubcategory", "meta_title","meta_keywords",
+                  "meta_description", "product_sku", "product_qty",
+                  "selling_price", "discount_price",
+                  "variation", "barcode", "product_thumbnail",
+                  "hot_deals", "featured",
+                  "recommended", "short_description",
+                  "product_specification", "long_description",
+                  "is_verified",
+                  "live", "same_day_deliver",
+                  "next_day_delivery", "hyper_local_delivery",
+                  "min_order_count",
+                  "max_order_count", "return_days",
+                  "out_of_stock_sell"
+                  "created_date", "updated_date",
+                  "images", "uploaded_images"
                   )
         read_only_fields = ['updated_date', 'created_date', 'product_id', 'slug']
 
@@ -42,4 +54,3 @@ class ProductSerializers(serializers.ModelSerializer):
                 ProductImages.objects.create(product=product, img=img)
 
             return product
-
