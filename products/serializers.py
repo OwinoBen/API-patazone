@@ -31,7 +31,7 @@ class ProductSerializers(serializers.ModelSerializer):
                   "next_day_delivery", "hyper_local_delivery",
                   "min_order_count",
                   "max_order_count", "return_days",
-                  "out_of_stock_sell"
+                  "out_of_stock_sell",
                   "created_date", "updated_date",
                   "images", "uploaded_images"
                   )
