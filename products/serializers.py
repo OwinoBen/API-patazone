@@ -1,23 +1,6 @@
 from django.utils.text import slugify
 from rest_framework import serializers, status
-from rest_framework.response import Response
-
-from products.models import PtzProducts, PtzMultipleimgs, PtzBrands, PtzMainslidersettings, Product, ProductImages
-
-
-class productGallerySerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PtzMultipleimgs
-        fields = '__all__'
-        depth = 2
-
-
-class ProductSerializer(serializers.ModelSerializer):
-    # product_gallery = productGallerySerializer(many=True)
-
-    class Meta:
-        model = PtzProducts
-        fields = '__all__'
+from products.models import Product, ProductImages
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -34,8 +17,8 @@ class ProductSerializers(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ("product_id", "product_title", "shop_name", "slug", "brand", "category", "subcategory",
-                  "subsubcategory", "product_tags", "product_sku", "product_qty", "selling_price", "discount_price",
+        fields = ("product_id", "product_title", "vendor", "slug", "brand", "category", "subcategory",
+                  "subsubcategory", "meta_title", "product_sku", "product_qty", "selling_price", "discount_price",
                   "variation", "barcode", "product_thumbnail", "hot_deals", "featured",
                   "recommended", "short_description", "product_specification", "long_description", "is_verified",
                   "created_date", "updated_date", "images", "uploaded_images"
@@ -49,7 +32,6 @@ class ProductSerializers(serializers.ModelSerializer):
         try:
             products = Product.objects.get(slug=slug)
             if products:
-                # return Response()
                 raise serializers.ValidationError({'success': 0, "code": status.HTTP_400_BAD_REQUEST,
                                                    'message': 'The product with the title already exists'})
         except Product.DoesNotExist:
@@ -61,14 +43,3 @@ class ProductSerializers(serializers.ModelSerializer):
 
             return product
 
-
-class BannerSliderSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = PtzMainslidersettings
-        fields = '__all__'
-
-
-class BrandSeializer(serializers.ModelSerializer):
-    class Meta:
-        model = PtzBrands
-        fields = "__all__"

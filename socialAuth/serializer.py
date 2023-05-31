@@ -1,6 +1,5 @@
 
 from rest_framework import serializers
-from rest_framework.exceptions import AuthenticationFailed
 
 from socialAuth.register_social_user import register_social_user
 from socialAuth.social_helper.Facebook_helper import Facebook

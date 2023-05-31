@@ -6,19 +6,18 @@ from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.pagination import PageNumberPagination
-from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
-from orders.models import PtzOrders, PtzCart, Orders
-from orders.serializers import OrderSerializer, CartSerializer, OrderSerializers
+from orders.models import Orders
+from orders.serializers import OrderSerializers
 from utils.messages.hundle_messages import successResponse, errorResponse
 
 
 @api_view(['POST', ])
 @permission_classes([IsAuthenticated])
-def placeOrder(request):
+def place_order(request):
     response = request.data
     order_number = random.randint(0, 100000)
     order_id = 'PTZORD' + str(order_number)
@@ -41,7 +40,7 @@ def placeOrder(request):
 
         if response['payment_option'] == 'Direct payment':
             if response['payment_mode'] == 'Pay on delivery':
-                serializer = OrderSerializer(data=response_data)
+                serializer = OrderSerializers(data=response_data)
                 if serializer.is_valid():
                     serializer.save()
                     cartItems = response['cart']
@@ -63,22 +62,22 @@ def placeOrder(request):
                             "product_sku": cart['product']['product_sku'],
                             "product_slug": cart['product']['slug']
                         }
-                        serializers = CartSerializer(data=cart_response)
+                        serializers = cart_response
 
                         if serializers.is_valid():
                             serializers.save()
                         else:
                             return Response({"message": serializers.errors}, status=status.HTTP_400_BAD_REQUEST)
-                    sendSMS(phone, order_id)
+                    send_sms(phone, order_id)
                     return Response({"order_id": order_id, "message": "Order placed successfully"},
                                     status=status.HTTP_200_OK)
                 return Response({"message": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Mpesa Express':
-                mpesaPayment(order_id)
+                mpesa_payment(order_id)
                 return Response({"message": "Payment method not available now, you can use cash option instead"},
                                 status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Card payment':
-                cardPayment(order_id)
+                card_payment(order_id)
                 return Response({"message": "Payment method not available now, you can use cash option instead"},
                                 status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Pay with paypal':
@@ -89,11 +88,11 @@ def placeOrder(request):
                                 status=status.HTTP_400_BAD_REQUEST)
         else:
             if response['payment_mode'] == 'Lipalater plan':
-                lipaLaterPlan(order_id)
+                lipa_later_plan(order_id)
                 return Response({"message": "Payment method not available now, you can use cash option instead"},
                                 status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Equity plan':
-                equityPlan(order_id)
+                equity_plan(order_id)
                 return Response({"message": "Payment method not available now, you can use cash option instead"},
                                 status=status.HTTP_400_BAD_REQUEST)
             elif response['payment_mode'] == 'Angaza Plan':
@@ -174,65 +173,35 @@ class OrderView(ModelViewSet):
             return Response(data=response_data, status=status.HTTP_403_FORBIDDEN)
 
 
-@api_view(['GET', ])
-@permission_classes([IsAuthenticated])
-def getUserOrders(request):
-    global serializers
-    userID = request.user.id
-    try:
-        orders = PtzOrders.objects.filter(user_id=userID)
-        for order in orders:
-            order_details = PtzCart.objects.filter(order_id=order.order_id)
-            serializers = CartSerializer(order_details, many=True)
-    except PtzOrders.DoesNotExist:
-        return Response({"success": False, "message": "Order not found"})
-    if request.method == 'GET':
-        serializer = OrderSerializer(orders, many=True)
-        return Response({"order": serializer.data, "order_details": serializers.data}, status=status.HTTP_200_OK)
 
 
-@api_view(['GET', ])
-@permission_classes([IsAuthenticated], )
-def getOrderItems(request, orderid=None):
-    if orderid is not None:
-        orderID = str(orderid)
-        try:
-            orderItems = PtzCart.objects.filter(order='PTZORD9893', user_id=request.user.id)
-            print(orderid)
-        except PtzCart.DoesNotExist:
-            return Response({"success": False, "message": "Order items not found"})
-        if request.method == 'GET':
-            serializer = CartSerializer(orderItems, many=True)
-            return Response({"order_details": serializer.data}, status=status.HTTP_200_OK)
-    else:
-        return Response({"success": False, "message": "No order ID provided"})
 
 
 def cash_on_delivery_payment(response, order_id):
     pass
 
 
-def mpesaPayment(order_id):
+def mpesa_payment(order_id):
     pass
 
 
-def cardPayment(order_id):
+def card_payment(order_id):
     pass
 
 
-def paypalPayment(order_id):
+def paypal_payment(order_id):
     pass
 
 
-def lipaLaterPlan(order_id):
+def lipa_later_plan(order_id):
     pass
 
 
-def equityPlan(order_id):
+def equity_plan(order_id):
     pass
 
 
-def sendSMS(phone, orderID):
+def send_sms(phone, orderID):
     url = 'https://vas.teleskytech.com/api/sendsms'
     message = "Dear Customer, \nthank you for your order. \nWe have received your order " + orderID + " and will contact you as soon as your package is shipped. \n. Regards, \nPatazone Team."
     data = {
@@ -257,14 +226,4 @@ def is_phone_number_valid(request, phone):
     return Response({"matched": True})
 
 
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])
-def getOrders(request):
-    try:
-        orders = PtzOrders.objects.all()
-    except PtzOrders.DoesNotExist:
-        return Response({"success": False, "message": "Order not found"})
 
-    if request.method == "GET":
-        serializer = OrderSerializer(orders, many=True)
-        return Response({"order": serializer.data}, status=status.HTTP_200_OK)

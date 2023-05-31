@@ -4,7 +4,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework import permissions
 
-from apiV1 import views
+from base import views
 
 from drf_yasg import openapi
 from drf_yasg.views import get_schema_view as swagger_get_schema_view
@@ -24,7 +24,7 @@ schema_view = swagger_get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('api/', include('apiV1.urls', namespace='apiV1'),),
+    path('api/', include('base.urls', namespace='base'), ),
     path('o/', include('oauth2_provider.urls')),
 
     # documentation urls

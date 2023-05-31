@@ -84,37 +84,6 @@ class Account(AbstractBaseUser):
         return True
 
 
-class PtzAccountUsers(models.Model):
-    first_name = models.CharField(max_length=255, blank=True, null=True)
-    last_name = models.CharField(max_length=255, blank=True, null=True)
-    phone = models.CharField(max_length=255, blank=True, null=True)
-    email = models.CharField(max_length=255, blank=True, null=True, unique=True)
-    username = models.CharField(max_length=255, blank=True, null=True)
-    password = models.CharField(max_length=255, blank=True, null=True)
-    id_image = models.CharField(max_length=255, blank=True, null=True)
-    business_type = models.CharField(max_length=255, blank=True, null=True)
-    second_phone = models.CharField(max_length=255, blank=True, null=True)
-    shop_address = models.CharField(max_length=255, blank=True, null=True)
-    kra_pin = models.CharField(max_length=255, blank=True, null=True)
-    store_number = models.CharField(max_length=255, blank=True, null=True)
-    store_name = models.CharField(max_length=255, blank=True, null=True)
-    national_id = models.CharField(max_length=255, blank=True, null=True)
-    is_staff = models.IntegerField()
-    is_superuser = models.IntegerField()
-    is_vendor = models.IntegerField()
-    is_active = models.IntegerField()
-    vendor_id = models.CharField(max_length=255, blank=True, null=True)
-    is_email_varified = models.CharField(max_length=255)
-    varification_key = models.CharField(max_length=255, blank=True, null=True)
-    user_image = models.CharField(max_length=255, blank=True, null=True)
-    gender = models.CharField(max_length=255, blank=True, null=True)
-    date_registered = models.DateTimeField()
-    date_updated = models.CharField(max_length=255)
-
-    class Meta:
-        managed = False
-        db_table = 'ptz_account_users'
-
 
 @receiver(post_save, sender=settings.AUTH_USER_MODEL)
 def create_auth_token(sender, instance=None, created=False, **kwargs):

@@ -1,6 +1,5 @@
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
-# Create your views here.
 from rest_framework.response import Response
 from .serializer import GoogleSocialAuthSerializer, FacebookAuthSerializer
 

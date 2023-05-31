@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('apiV1', '0009_auto_20230414_1342'),
+        ('base', '0009_auto_20230414_1342'),
     ]
 
     operations = [
@@ -73,7 +73,7 @@ class Migration(migrations.Migration):
                 ('is_major', models.BooleanField(blank=True, default=False, null=True)),
                 ('date_created', models.DateTimeField(auto_now_add=True)),
                 ('soft_delete', models.BooleanField(default=False)),
-                ('category_id', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='apiV1.categories')),
+                ('category_id', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='base.categories')),
             ],
         ),
         migrations.CreateModel(
@@ -101,9 +101,9 @@ class Migration(migrations.Migration):
                 ('created_date', models.DateTimeField(auto_now_add=True)),
                 ('updated_date', models.CharField(blank=True, max_length=255, null=True)),
                 ('brand', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.brands')),
-                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='category', to='apiV1.categories')),
-                ('subcategory', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subcategory', to='apiV1.subcategories')),
-                ('subsubcategory', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subsubcategory', to='apiV1.subsubcategories')),
+                ('category', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='category', to='base.categories')),
+                ('subcategory', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subcategory', to='base.subcategories')),
+                ('subsubcategory', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='subsubcategory', to='base.subsubcategories')),
             ],
         ),
         migrations.CreateModel(

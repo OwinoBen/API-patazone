@@ -9,9 +9,9 @@ router.register('order', views.OrderView)
 
 urlpatterns = [
     path('', include(router.urls)),
-    path('placeorder', views.placeOrder, name="place-order"),
+    # path('placeorder', views.placeOrder, name="place-order"),
     path('messages/<phone>', views.is_phone_number_valid, name="messages"),
-    path('customer-orders', views.getUserOrders, name="customer-orders"),
-    path('orderItems/<orderid>', views.getOrderItems, name="order-items"),
-    path('list', views.getOrders, name="orders-list")
+    # path('customer-orders', views.getUserOrders, name="customer-orders"),
+    # path('orderItems/<orderid>', views.getOrderItems, name="order-items"),
+    # path('list', views.getOrders, name="orders-list")
 ]

@@ -11,6 +11,7 @@ load_dotenv()
 
 GOOGLE_API_KEY = os.getenv('GOOGLE_API_KEY')
 
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def geocode_api(request, lat, lng):

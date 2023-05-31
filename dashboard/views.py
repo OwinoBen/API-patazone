@@ -12,5 +12,5 @@ from orders.serializers import OrderSerializers
 class DashboardView(ListAPIView):
     serializer_class = OrderSerializers
 
-    queryset = Orders.objects.getOrdersByWeeksRange(2, 8)
+    queryset = Orders.objects.get_orders_by_weeks_range(2, 8)
 

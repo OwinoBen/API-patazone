@@ -11,23 +11,23 @@ from django.utils import timezone
 
 from address.models import Address
 from auth_apps.models import Account
-from products.models import PtzProducts, Product
+from products.models import Product
 
 
 # Create your models here.
 
 class OrderManagementQuerySet(models.QuerySet):
-    def recentOrders(self):
+    def recent_orders(self):
         return self.order_by('-updated_at', '-created_at')
 
     def getSells_breakdown(self):
-        recent = self.recentOrders().not_refunded()
-        recent_orders = recent.recentOrders()
-        recent_cart_data = recent.getCartData()
-        shipped = recent.not_refunded().getOrderByStatus(status='shipped')
-        shipped_orders = shipped.orderTotal()
-        paid = recent.getOrderByStatus(status='paid')
-        paid_orders = paid.orderTotal()
+        recent = self.recent_orders().not_refunded()
+        recent_orders = recent.recent_orders()
+        recent_cart_data = recent.get_cartData()
+        shipped = recent.not_refunded().get_order_by_status(status='shipped')
+        shipped_orders = shipped.order_total()
+        paid = recent.get_order_by_status(status='paid')
+        paid_orders = paid.order_total()
 
         data = {
             'recent': recent,
@@ -44,38 +44,38 @@ class OrderManagementQuerySet(models.QuerySet):
     def not_refunded(self):
         return self.exclude(status='refunded')
 
-    def getOrdersByWeeksRange(self, weeks_ago=7, number_of_weeks=2):
+    def get_orders_by_weeks_range(self, weeks_ago=7, number_of_weeks=2):
         if number_of_weeks > weeks_ago:
             number_of_weeks = weeks_ago
         days_ago_start = weeks_ago * 7
         days_ago_end = days_ago_start - (number_of_weeks * 7)
         start_date = timezone.now() - datetime.timedelta(days=days_ago_start)
         end_date = timezone.now() - datetime.timedelta(days=days_ago_end)
-        return self.getOrderByRange(start_date, end_date=end_date)
+        return self.get_order_by_range(start_date, end_date=end_date)
 
-    def getOrderByRange(self, start_date, end_date=None):
+    def get_order_by_range(self, start_date, end_date=None):
         if end_date is None:
             return self.filter(updated_at__gte=start_date)
         return self.filter(updated_at__gte=start_date).filter(updated_at__lte=end_date)
 
-    def getOrderByDate(self):
+    def get_order_by_date(self):
         now = timezone.now() - datetime.timedelta(days=9)
         return self.filter(updated_at__day__gte=now.day)
 
-    def orderTotal(self):
+    def order_total(self):
         return self.aggregate(Sum("total_amount"), Avg("total_amount"))
 
-    def getCartData(self):
+    def get_cart_data(self):
         return self.aggregate(
             Sum("items__product__discount_price"),
             Avg("items__product__discount_price"),
             Count("items__product")
         )
 
-    def getOrderByStatus(self, status='shipped'):
+    def get_order_by_status(self, status='shipped'):
         return self.filter(status=status)
 
-    def getNotCreatedOrders(self):
+    def get_not_created_orders(self):
         return self.exclude(status='created')
 
 
@@ -90,14 +90,14 @@ class OrderManager(models.Manager):
     def get_queryset(self):
         return OrderManagementQuerySet(self.model, using=self._db)
 
-    def getSells_breakdown(self):
+    def get_sells_breakdown(self):
         return self.get_queryset().getSells_breakdown()
 
-    def getOrderByRange(self, start_date, end_date=None):
-        return self.get_queryset().getOrderByRange(start_date, end_date)
+    def get_order_by_range(self, start_date, end_date=None):
+        return self.get_queryset().get_order_by_range(start_date, end_date)
 
-    def getOrdersByWeeksRange(self, weeks_ago, number_of_weeks):
-        return self.get_queryset().getOrdersByWeeksRange(weeks_ago=weeks_ago, number_of_weeks=number_of_weeks)
+    def get_orders_by_weeks_range(self, weeks_ago, number_of_weeks):
+        return self.get_queryset().get_orders_by_weeks_range(weeks_ago=weeks_ago, number_of_weeks=number_of_weeks)
 
 
 class Coupon(models.Model):
@@ -137,22 +137,18 @@ class Orders(models.Model):
     def __str__(self):
         return self.order_id
 
-    # @property
-    # def items(self):
-    #     return self.items.set.all()
-
     def save(self, *args, **kwargs):
         orderId = 'PTZORD' + str(random.randint(1, 1000000))
         self.order_id = orderId
         super().save(*args, **kwargs)
 
-    def subTotal(self):
+    def sub_total(self):
         subtotal = 0
         for ordersItem in self.items.all():
             subtotal += ordersItem.getTotalItemPrice()
         return subtotal
 
-    def getTotal(self):
+    def get_total(self):
         total = 0
         for item in self.items.all():
             total += item.getFinalOrderAmount()
@@ -160,10 +156,10 @@ class Orders(models.Model):
             total -= self.coupon.amount
         return total
 
-    def getAbsoluteUrl(self):
+    def get_absoluteUrl(self):
         return reverse("order:detail", kwargs={'order_id': self.order_id})
 
-    def getStatus(self) -> str:
+    def get_status(self) -> str:
         if self.status == 'refunded':
             return 'Refunded order'
         elif self.status == 'shipped':
@@ -171,7 +167,7 @@ class Orders(models.Model):
         return 'Shipping soon'
 
     def update_total(self):
-        cart_total = self.getTotal()
+        cart_total = self.get_total()
         shipping_total = self.shipping_total
         new_total = math.fsum([cart_total, shipping_total])
         formatted_total = format(new_total, '.2f')
@@ -209,22 +205,22 @@ class OrderItems(models.Model):
         return f"{self.quantity} of {self.product.product_title}"
 
     def save(self, *args, **kwargs):
-        self.order.total_amount = self.getFinalOrderAmount()
+        self.order.total_amount = self.get_final_order_amount()
         super().save(*args, **kwargs)
 
-    def getTotalItemPrice(self) -> float:
+    def get_total_item_price(self) -> float:
         return self.quantity * self.product.selling_price
 
-    def getTotalDiscountPrice(self) -> float:
+    def get_total_discount_price(self) -> float:
         return self.quantity * self.product.discount_price
 
-    def getOrderAmountSaved(self):
-        return self.getTotalItemPrice() - self.getTotalDiscountPrice()
+    def get_order_amount_saved(self):
+        return self.get_total_item_price() - self.get_total_discount_price()
 
-    def getFinalOrderAmount(self):
+    def get_final_order_amount(self):
         if self.product.discount_price:
-            return self.getTotalDiscountPrice()
-        return self.getTotalItemPrice()
+            return self.get_total_discount_price()
+        return self.get_total_item_price()
 
 
 class PurchasedProductQuerySet(models.query.QuerySet):
@@ -236,7 +232,7 @@ class PurchasedProductManager(models.Manager):
     def get_queryset(self):
         return PurchasedProductQuerySet(self.model, using=self._db)
 
-    def getAll(self):
+    def get_all(self):
         return self.get_queryset().active()
 
 
@@ -262,59 +258,3 @@ class Refund(models.Model):
 
     def __str__(self):
         return f"{self.user.firstname} {self.user.lastname}"
-
-
-class PtzOrders(models.Model):
-    order_id = models.CharField(primary_key=True, max_length=255)
-    user_id = models.CharField(max_length=255, blank=True, null=True)
-    payment_id = models.CharField(max_length=255)
-    coupon_id = models.IntegerField(blank=True, null=True)
-    amount_paid = models.CharField(max_length=255, blank=True, null=True)
-    county = models.CharField(max_length=255, blank=True, null=True)
-    region = models.CharField(max_length=255, blank=True, null=True)
-    street = models.CharField(max_length=255, blank=True, null=True)
-    shipping_fee = models.CharField(max_length=255, blank=True, null=True)
-    discount = models.CharField(max_length=255, blank=True, null=True)
-    is_paid = models.IntegerField()
-    order_notes = models.TextField(blank=True, null=True)
-    payment_mode = models.CharField(max_length=255, blank=True, null=True)
-    order_status = models.CharField(max_length=255)
-    user_type = models.CharField(max_length=255)
-    date_created = models.DateTimeField(auto_now_add=True)
-    soft_delete = models.CharField(max_length=50)
-
-    class Meta:
-        managed = False
-        db_table = 'ptz_orders'
-
-    def __str__(self):
-        return self.order_id
-
-
-class PtzCart(models.Model):
-    user_id = models.CharField(max_length=255)
-    product = models.ForeignKey(PtzProducts, models.CASCADE)
-    order = models.ForeignKey(PtzOrders, on_delete=models.CASCADE)
-    product_name = models.CharField(max_length=255)
-    product_qty = models.IntegerField()
-    product_price = models.CharField(max_length=255)
-    product_size = models.CharField(max_length=255, blank=True, null=True)
-    product_color = models.CharField(max_length=255, blank=True, null=True)
-    ordered = models.IntegerField()
-    discounted_amount = models.CharField(max_length=255, blank=True, null=True)
-    discount_price = models.CharField(max_length=255, blank=True, null=True)
-    shop_name = models.CharField(max_length=255, blank=True, null=True)
-    product_image = models.CharField(max_length=255)
-    product_material = models.CharField(max_length=255, blank=True, null=True)
-    product_number = models.CharField(max_length=255)
-    product_sku = models.CharField(max_length=255)
-    product_slug = models.CharField(max_length=255)
-    date_created = models.DateTimeField(auto_now_add=True)
-    soft_delete = models.CharField(max_length=50)
-
-    class Meta:
-        managed = False
-        db_table = 'ptz_cart'
-
-    def __str__(self):
-        return self.product_name

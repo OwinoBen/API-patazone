@@ -31,8 +31,8 @@ SECRET_KEY = os.environ.get('SECRET_KEY')
 # DEBUG = True  # turning false to allow error 500 displayed as json
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = ['*']
-# ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
+# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = os.environ.get("ALLOWED_HOSTS").split(" ")
 
 APPEND_SLASH = False  # REMOVE THE TRAILING SLASH IN URL e.g http://127.0.0.1:8000/
 
@@ -46,7 +46,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # 'whitenoise.runserver_nostatic',
 
     'corsheaders',
     'rest_framework',
@@ -58,7 +57,7 @@ INSTALLED_APPS = [
     'drf_spectacular',
     'drf_spectacular_sidecar',
 
-    'apiV1',
+    'base',
     'auth_apps',
     'products',
     'checkout',
@@ -71,6 +70,7 @@ INSTALLED_APPS = [
     'report',
     'merchant',
     'setting',
+    'payments'
 
 ]
 
@@ -80,7 +80,7 @@ OAUTH2_PROVIDER = {
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication'
         # 'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
     ],
@@ -164,8 +164,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 
 ]
-# authorize link
-# http://127.0.0.1:8000/o/authorize/?response_type=code&code_challenge=XRi41b-5yHtTojvCpXFpsLUnmGFz6xR15c3vpPANAvM&client_id=YIynQ80KB0Kh1yATZwIxFTRxSHuXCKHndLnjOOer&redirect_uri=http://127.0.0.1:8000/noexist/callback
+
 ROOT_URLCONF = 'api.urls'
 
 TEMPLATES = [
@@ -219,6 +218,7 @@ DATABASES = {
 if 'test' in sys.argv or 'test\_coverage' in sys.argv:  # Covers regular testing and django-coverage
     DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'
     DATABASES['default']['NAME'] = ':memory:'
+
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
 
@@ -258,24 +258,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static/')
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'static/media')
 
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # CORS SETTINGS
-
-# CORS_ALLOW_METHODS = {
-#     'GET',
-#     'POST',
-#     'PUT',
-#     'PATCH',
-#     'DELETE',
-#     'OPTIONS'
-# }
-
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000', 'http://localhost:1337']
 CORS_ALLOW_CREDENTIALS = True
