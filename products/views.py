@@ -84,30 +84,24 @@ class ProductsViewSet(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         """
-        modelSetView update method
-        performing product update operations and patch operations
+        Modify Product details
         :param request:
         :param args:
         :param kwargs:
         :return:
         """
-        if request.user.is_admin or request.user.is_staff or request.user.is_vendor or request.user.is_superuser:
-            partial = kwargs.pop('partial', False)
-            instance = self.get_object()
-            serializer = self.get_serializer(instance, data=request.data, partial=partial)
-            serializer.is_valid(raise_exception=True)
-            self.perform_update(serializer)
-            data = successResponse(status_code=status.HTTP_200_OK,
-                                   message_code="update_success",
-                                   message=f"{instance} updated successfully")
-            headers = self.get_success_headers(serializer.data)
-            return Response(data=data, status=status.HTTP_200_OK, headers=headers)
-        else:
-            response_data = errorResponse(status_code=status.HTTP_403_FORBIDDEN, error_code="permission_denied",
-                                          message="You have no permission to update the resource.Contact "
-                                                  "system admin to grant permission.")
-
-            return Response(data=response_data, status=status.HTTP_403_FORBIDDEN)
+        instance = self.get_object()
+        if not instance:
+            response_data = errorResponse(status_code=status.HTTP_400_BAD_REQUEST, error_code="not_found", message="Resource not found")
+            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
+        serializer = self.get_serializer(instance, many=isinstance(request.data, list), partial=True, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.update(instance, request.data)
+        data = successResponse(status_code=status.HTTP_200_OK,
+                               message_code="update_success",
+                               message=f"{instance} updated successfully")
+        headers = self.get_success_headers(serializer.data)
+        return Response(data=data, status=status.HTTP_200_OK, headers=headers)
 
 
 class ApiProductsView(ListAPIView):

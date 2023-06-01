@@ -19,7 +19,7 @@ class ProductSerializers(serializers.ModelSerializer):
         model = Product
         fields = ("product_id", "product_title",
                   "vendor", "slug", "brand", "category", "subcategory",
-                  "subsubcategory", "meta_title","meta_keywords",
+                  "subsubcategory", "meta_title", "meta_keywords",
                   "meta_description", "product_sku", "product_qty",
                   "selling_price", "discount_price",
                   "variation", "barcode", "product_thumbnail",
@@ -64,9 +64,31 @@ class ProductSerializers(serializers.ModelSerializer):
 
         instance.save(update_fields=updated_fields)
 
+        """getting list of product gallery"""
         product_gallery = ProductImages.objects.filter(product=instance.product_id)
         product_images_id = []
 
         for image in product_images:
-            if ProductImages.objects.filter(id=image[id]):
+            if "id" in image.keys():
+                if ProductImages.objects.filter(id=image[id]).exists():
+                    product_image_instance = ProductImages.objects.get(id=image['id'])
+                    product_instance = Product.objects.get(product_id=image.get('product'))
+                    product_image_instance.product = product_instance
+                    product_image_instance.img = image.get('img', product_image_instance.img)
 
+                    product_image_instance.save()
+                    product_images_id.append(product_image_instance.id)
+                else:
+                    continue
+            else:
+                product_instance = Product.objects.get(product_id=image['product'])
+                new_item_instance = ProductImages.objects.create(
+                    product=product_instance,
+                    img=image['img'],
+                )
+                product_images_id.append(new_item_instance.id)
+                for product_image_id in product_gallery:
+                    if product_image_id not in product_images_id:
+                        ProductImages.objects.filter(id=product_image_id).delete()
+
+            return instance
