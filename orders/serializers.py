@@ -42,7 +42,7 @@ class OrderSerializers(serializers.ModelSerializer):
             return order
 
     def update(self, instance, validated_data):
-        item_list = validated_data.pop('items')
+        items = validated_data.pop('items')
         updated_field = [k for k in validated_data]
         for k, v in validated_data.items():
             setattr(instance, k, v)
@@ -51,7 +51,7 @@ class OrderSerializers(serializers.ModelSerializer):
         """getting list of orderItems"""
         order_items = OrderItems.objects.filter(order=instance.id).values_list('id', flat=True)
         items_id = []
-        for item in item_list:
+        for item in items:
 
             if "id" in item.keys():
                 if OrderItems.objects.filter(id=item['id']).exists():

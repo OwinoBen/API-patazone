@@ -54,3 +54,19 @@ class ProductSerializers(serializers.ModelSerializer):
                 ProductImages.objects.create(product=product, img=img)
 
             return product
+
+    def update(self, instance, validated_data):
+        product_images = validated_data.pop('uploaded_images')
+        updated_fields = [k for k in validated_data]
+
+        for k, v in validated_data.items():
+            setattr(instance, k, v)
+
+        instance.save(update_fields=updated_fields)
+
+        product_gallery = ProductImages.objects.filter(product=instance.product_id)
+        product_images_id = []
+
+        for image in product_images:
+            if ProductImages.objects.filter(id=image[id]):
+

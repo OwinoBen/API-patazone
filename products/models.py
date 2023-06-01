@@ -39,7 +39,7 @@ class Brands(models.Model):
 
 
 class Product(models.Model):
-    product_id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4())
+    product_id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
     product_title = models.CharField(max_length=255)
     vendor = models.CharField(max_length=255)
     slug = models.SlugField(max_length=255, blank=True, null=True, unique=True)
