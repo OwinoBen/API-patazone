@@ -13,13 +13,13 @@ from rest_framework.viewsets import ModelViewSet
 from utils.messages.hundle_messages import successResponse, errorResponse
 
 from products.models import Product
-from products.serializers import ProductSerializers
+from products.serializers import ProductSerializer
 
 
 class ProductsViewSet(ModelViewSet):
     queryset = Product.objects.all().order_by('-created_date', '-pk')
     permission_classes = [IsAuthenticatedOrReadOnly]
-    serializer_class = ProductSerializers
+    serializer_class = ProductSerializer
     parser_classes = (MultiPartParser, FormParser)
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -96,7 +96,7 @@ class ProductsViewSet(ModelViewSet):
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance, many=isinstance(request.data, list), partial=True, data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.update(instance, request.data)
+        serializer.update(instance, serializer.validated_data)
         data = successResponse(status_code=status.HTTP_200_OK,
                                message_code="update_success",
                                message=f"{instance} updated successfully")
@@ -113,7 +113,7 @@ class ApiProductsView(ListAPIView):
         [ref]: http://example.com/activating-accounts
         """
     # queryset = PtzProducts.objects.filter(is_varified='yes', product_qty__gte=1).order_by("?")
-    serializer_class = ProductSerializers
+    serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)

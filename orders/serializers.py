@@ -11,7 +11,7 @@ class OrderItemSerializer(serializers.ModelSerializer):
         read_only_fields = ('order', 'customer',)
 
 
-class OrderSerializers(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
     items = OrderItemSerializer(many=True)
 
     class Meta:

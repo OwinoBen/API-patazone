@@ -4,7 +4,7 @@ import uuid
 
 # Create your models here.
 class Categories(models.Model):
-    id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4())
+    id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4)
     category_name = models.CharField(max_length=30)
     category_image = models.ImageField(upload_to="categories", default="", null=True, blank=True)
     category_thumbnail = models.ImageField(upload_to="categories", default="", null=True, blank=True)
@@ -17,7 +17,7 @@ class Categories(models.Model):
 
 
 class Subcategories(models.Model):
-    id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4())
+    id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE, related_name="categories")
     subcategory_name = models.CharField(max_length=255)
     date_created = models.DateTimeField(auto_now_add=True)
@@ -28,7 +28,7 @@ class Subcategories(models.Model):
 
 
 class SubsubCategories(models.Model):
-    id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4())
+    id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE, related_name="categoryID")
     subcategory = models.ForeignKey(Subcategories, on_delete=models.CASCADE, related_name="subcategoryID")
     name = models.CharField(max_length=255)

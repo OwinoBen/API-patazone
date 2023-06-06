@@ -109,7 +109,7 @@ class Coupon(models.Model):
 
 
 class Orders(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4(), editable=False, unique=True)
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     order_id = models.CharField(max_length=125, unique=True, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user')
     payment = models.CharField(max_length=255, blank=True, null=True)

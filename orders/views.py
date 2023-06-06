@@ -11,7 +11,7 @@ from rest_framework.response import Response
 from rest_framework.viewsets import ModelViewSet
 
 from orders.models import Orders
-from orders.serializers import OrderSerializers
+from orders.serializers import OrderSerializer
 from utils.messages.hundle_messages import successResponse, errorResponse
 
 
@@ -40,7 +40,7 @@ def place_order(request):
 
         if response['payment_option'] == 'Direct payment':
             if response['payment_mode'] == 'Pay on delivery':
-                serializer = OrderSerializers(data=response_data)
+                serializer = OrderSerializer(data=response_data)
                 if serializer.is_valid():
                     serializer.save()
                     cartItems = response['cart']
@@ -105,7 +105,7 @@ def place_order(request):
 
 class OrderView(ModelViewSet):
     queryset = Orders.objects.all()
-    serializer_class = OrderSerializers
+    serializer_class = OrderSerializer
     pagination_class = PageNumberPagination
     # parser_classes = (MultiPartParser, FormParser)
 

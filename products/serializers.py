@@ -1,6 +1,8 @@
 from django.utils.text import slugify
 from rest_framework import serializers, status
-from products.models import Product, ProductImages
+
+from categories.models import Categories
+from products.models import Product, ProductImages, Brands
 
 
 class ProductImageSerializer(serializers.ModelSerializer):
@@ -9,7 +11,7 @@ class ProductImageSerializer(serializers.ModelSerializer):
         fields = ('id', 'product', 'img', 'date_created')
 
 
-class ProductSerializers(serializers.ModelSerializer):
+class ProductSerializer(serializers.ModelSerializer):
     images = ProductImageSerializer(many=True, read_only=True)
     uploaded_images = serializers.ListField(
 
@@ -56,7 +58,19 @@ class ProductSerializers(serializers.ModelSerializer):
             return product
 
     def update(self, instance, validated_data):
-        product_images = validated_data.pop('uploaded_images')
+        global product_brand
+        uploaded_images = validated_data.pop('uploaded_images')
+
+
+        if validated_data['subcategory'] is not None or \
+                validated_data['subsubcategory'] is not None or validated_data['brand'] is not None:
+            product_category = validated_data.pop('category')
+            product_subcategory = validated_data.pop('subcategory')
+            product_subsubcategory = validated_data.pop('subsubcategory')
+            product_brand = validated_data.pop('brand')
+            category_instance = Categories.objects.get(id=str(product_category))
+            brand_instance = Brands.objects.get(brand_id=str(product_brand))
+
         updated_fields = [k for k in validated_data]
 
         for k, v in validated_data.items():
@@ -66,9 +80,10 @@ class ProductSerializers(serializers.ModelSerializer):
 
         """getting list of product gallery"""
         product_gallery = ProductImages.objects.filter(product=instance.product_id)
-        product_images_id = []
 
-        for image in product_images:
+        product_images_id = []
+        print(uploaded_images)
+        for image in uploaded_images:
             if "id" in image.keys():
                 if ProductImages.objects.filter(id=image[id]).exists():
                     product_image_instance = ProductImages.objects.get(id=image['id'])

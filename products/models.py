@@ -25,7 +25,7 @@ def imagePath(instance, filename):
 
 
 class Brands(models.Model):
-    brand_id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4())
+    brand_id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     category_id = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
     brand_title = models.CharField(max_length=255)
     slug = models.SlugField(unique=True, blank=True, max_length=255)
