@@ -49,7 +49,6 @@ def _handle_generic_error(exc, context, response):
 
 def _handle_request_error(exc, context, response):
     error_details = dict()
-    print(response)
     error_message = ""
     for dat in response.data:
         ms = [f'{dat} field is required']

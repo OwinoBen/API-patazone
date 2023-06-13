@@ -1,4 +1,3 @@
-
 from rest_framework import serializers
 
 from socialAuth.register_social_user import register_social_user
@@ -19,7 +18,7 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
             )
         # if userdata['aud'] != os.environ.get('GOOGLE_CLIENT_ID'):
         #     raise AuthenticationFailed('oops, who are you')
-        user_id = userdata['sub']
+        # user_id = userdata['sub']
         email = userdata['email']
         firstname = userdata['given_name']
         lastname = userdata['family_name']
@@ -27,7 +26,6 @@ class GoogleSocialAuthSerializer(serializers.Serializer):
 
         return register_social_user(
             provider=provider,
-            user_id=user_id,
             email=email,
             firstname=firstname,
             lastname=lastname
@@ -40,15 +38,13 @@ class FacebookAuthSerializer(serializers.Serializer):
     def validate_auth_token(self, auth_token):
         try:
             user_data = Facebook.validate(auth_token)
-        except Exception as identifier:
+        except Exception:
             raise serializers.ValidationError('The token is invalid or expired. Please login again')
 
-        user_id = user_data['id']
+        # user_id = user_data['id']
         email = user_data['email']
         firstname = user_data['first_name']
         lastname = user_data['last_name']
         provider = 'facebook'
-        return register_social_user(user_id=user_id, email=email, firstname=firstname, lastname=lastname,
+        return register_social_user(email=email, firstname=firstname, lastname=lastname,
                                     provider=provider)
-
-

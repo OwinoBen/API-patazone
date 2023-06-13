@@ -138,8 +138,7 @@ class Orders(models.Model):
         return self.order_id
 
     def save(self, *args, **kwargs):
-        orderId = 'PTZORD' + str(random.randint(1, 1000000))
-        self.order_id = orderId
+
         super().save(*args, **kwargs)
 
     def sub_total(self):

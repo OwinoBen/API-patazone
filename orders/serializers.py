@@ -1,3 +1,4 @@
+import random
 from rest_framework import serializers
 
 from orders.models import OrderItems, Orders
@@ -31,7 +32,9 @@ class OrderSerializer(serializers.ModelSerializer):
 
         if payment_mode == 'Cash':
             order_items = validated_data.pop('items')
-            order = Orders.objects.create(user=user, **validated_data)
+            orderId = 'PTZORD' + str(random.randint(1, 1000000))
+            order_id = orderId
+            order = Orders.objects.create(user=user, order_id=order_id, **validated_data)
 
             for item in order_items:
                 OrderItems.objects.create(
@@ -42,6 +45,7 @@ class OrderSerializer(serializers.ModelSerializer):
             return order
 
     def update(self, instance, validated_data):
+
         items = validated_data.pop('items')
         updated_field = [k for k in validated_data]
         for k, v in validated_data.items():

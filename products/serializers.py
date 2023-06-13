@@ -58,52 +58,11 @@ class ProductSerializer(serializers.ModelSerializer):
             return product
 
     def update(self, instance, validated_data):
-        global product_brand
-        uploaded_images = validated_data.pop('uploaded_images')
-
-
-        if validated_data['subcategory'] is not None or \
-                validated_data['subsubcategory'] is not None or validated_data['brand'] is not None:
-            product_category = validated_data.pop('category')
-            product_subcategory = validated_data.pop('subcategory')
-            product_subsubcategory = validated_data.pop('subsubcategory')
-            product_brand = validated_data.pop('brand')
-            category_instance = Categories.objects.get(id=str(product_category))
-            brand_instance = Brands.objects.get(brand_id=str(product_brand))
-
+        if validated_data.__contains__('uploaded_images'):
+            validated_data.pop('uploaded_images')
         updated_fields = [k for k in validated_data]
-
         for k, v in validated_data.items():
             setattr(instance, k, v)
-
         instance.save(update_fields=updated_fields)
 
-        """getting list of product gallery"""
-        product_gallery = ProductImages.objects.filter(product=instance.product_id)
-
-        product_images_id = []
-        print(uploaded_images)
-        for image in uploaded_images:
-            if "id" in image.keys():
-                if ProductImages.objects.filter(id=image[id]).exists():
-                    product_image_instance = ProductImages.objects.get(id=image['id'])
-                    product_instance = Product.objects.get(product_id=image.get('product'))
-                    product_image_instance.product = product_instance
-                    product_image_instance.img = image.get('img', product_image_instance.img)
-
-                    product_image_instance.save()
-                    product_images_id.append(product_image_instance.id)
-                else:
-                    continue
-            else:
-                product_instance = Product.objects.get(product_id=image['product'])
-                new_item_instance = ProductImages.objects.create(
-                    product=product_instance,
-                    img=image['img'],
-                )
-                product_images_id.append(new_item_instance.id)
-                for product_image_id in product_gallery:
-                    if product_image_id not in product_images_id:
-                        ProductImages.objects.filter(id=product_image_id).delete()
-
-            return instance
+        return instance

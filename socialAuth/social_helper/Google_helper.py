@@ -1,5 +1,5 @@
 from google.auth.transport import requests
-from google.oauth2 import id_token, service_account, credentials
+from google.oauth2 import id_token
 
 
 class Google:

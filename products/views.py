@@ -2,6 +2,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.authentication import TokenAuthentication
+from rest_framework.decorators import action
 from rest_framework.filters import SearchFilter, OrderingFilter
 from rest_framework.generics import ListAPIView
 from rest_framework.pagination import PageNumberPagination
@@ -12,8 +13,8 @@ from rest_framework.viewsets import ModelViewSet
 
 from utils.messages.hundle_messages import successResponse, errorResponse
 
-from products.models import Product
-from products.serializers import ProductSerializer
+from products.models import Product, ProductImages
+from products.serializers import ProductSerializer, ProductImageSerializer
 
 
 class ProductsViewSet(ModelViewSet):
@@ -92,7 +93,8 @@ class ProductsViewSet(ModelViewSet):
         """
         instance = self.get_object()
         if not instance:
-            response_data = errorResponse(status_code=status.HTTP_400_BAD_REQUEST, error_code="not_found", message="Resource not found")
+            response_data = errorResponse(status_code=status.HTTP_400_BAD_REQUEST, error_code="not_found",
+                                          message="Resource not found")
             return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
         serializer = self.get_serializer(instance, many=isinstance(request.data, list), partial=True, data=request.data)
         serializer.is_valid(raise_exception=True)
@@ -103,6 +105,74 @@ class ProductsViewSet(ModelViewSet):
         headers = self.get_success_headers(serializer.data)
         return Response(data=data, status=status.HTTP_200_OK, headers=headers)
 
+    @action(
+        detail=True,
+        methods=['post', 'delete'],
+        url_name='update-gallery',
+        url_path=r'update_gallery/(?P<gallery_id>\w+)')
+    def update_gallery(self, request, pk=None, gallery_id=None):
+        """
+        Upload both single and multiple product images with the given params(product_id and image) only authenticated
+        users can perform this action, Deletes product images in the product gallery list
+        :param request:
+        :param pk:
+        :param gallery_id:
+        :return:
+        """
+        if request.method == 'POST':
+            flag = 1
+            response_message = []
+            try:
+                product = Product.objects.get(product_id=pk)
+            except ProductImages.DoesNotExist:
+                response_data = errorResponse(status_code=status.HTTP_404_NOT_FOUND, error_code="not found",
+                                              message="Product with the given details not found")
+                return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+            response = request.data
+            response['product'] = product.product_id
+            images = dict(response.lists())['img']
+
+            for image in images:
+                modified_data = modify_inputs_for_files(product.product_id, image)
+                serializer = ProductImageSerializer(data=modified_data, )
+                if serializer.is_valid():
+                    serializer.save()
+                else:
+                    flag = 0
+                    response_message.append(serializer.errors)
+
+            if flag == 1:
+                data = successResponse(status_code=status.HTTP_200_OK,
+                                       message_code="upload_success",
+                                       message=f" Image/s uploaded successfully")
+                return Response(data, status=status.HTTP_201_CREATED)
+            else:
+                response_data = errorResponse(status_code=status.HTTP_400_BAD_REQUEST, error_code="bad request",
+                                              message=response_message)
+                return Response(response_data, status=status.HTTP_400_BAD_REQUEST)
+
+        if request.method == 'DELETE':
+            try:
+                if gallery_id is not None and pk is not None:
+                    product = ProductImages.objects.get(product=pk, id=gallery_id)
+                    if product:
+                        product.delete()
+                        response_message = successResponse(status_code=status.HTTP_204_NO_CONTENT,
+                                                           message_code="delete_success",
+                                                           message=f"Image Deleted successfully")
+                        return Response(data=response_message, status=status.HTTP_204_NO_CONTENT)
+            except ProductImages.DoesNotExist:
+                response_data = errorResponse(status_code=status.HTTP_404_NOT_FOUND, error_code="not found",
+                                              message="Instance not found")
+                return Response(response_data, status=status.HTTP_404_NOT_FOUND)
+
+        return Response(status=status.HTTP_200_OK)
+
+
+def modify_inputs_for_files(product_id, image):
+    serializer_data = {'img': image, 'product': product_id}
+    return serializer_data
+
 
 class ApiProductsView(ListAPIView):
     """
@@ -110,13 +180,11 @@ class ApiProductsView(ListAPIView):
 
         For more details on how Products are verified please [see here][ref].
 
-        [ref]: http://example.com/activating-accounts
+        [ref]: https://example.com/activating-accounts
         """
-    # queryset = PtzProducts.objects.filter(is_varified='yes', product_qty__gte=1).order_by("?")
+    # queryset = PtzProducts.objects.filter(is_verified='yes', product_qty__gte=1).order_by("?")
     serializer_class = ProductSerializer
     authentication_classes = (TokenAuthentication,)
     pagination_class = PageNumberPagination
     filter_backends = (SearchFilter, OrderingFilter)
     search_fields = ('^product_title', '^discount_price', '^product_tags')
-
-

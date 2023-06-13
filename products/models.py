@@ -84,6 +84,15 @@ class Product(models.Model):
         self.product_sku = sku
         super().save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        # first, delete the image file
+        for image in self.images.all():
+            storage, path = image.img.storage, image.img.path
+            image.img.delete(save=False)
+        self.product_thumbnail.delete(save=False)
+        # now delete the object
+        super(Product, self).delete(*args, **kwargs)
+
     def __str__(self):
         return "%s" % self.product_title
 
@@ -95,3 +104,9 @@ class ProductImages(models.Model):
 
     def __str__(self):
         return str(self.product.product_id)
+
+    def delete(self, *args, **kwargs):
+        # first, delete the image file
+        self.img.delete(save=False)
+        # now delete the object
+        super(ProductImages, self).delete(*args, **kwargs)

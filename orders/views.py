@@ -107,6 +107,7 @@ class OrderView(ModelViewSet):
     queryset = Orders.objects.all()
     serializer_class = OrderSerializer
     pagination_class = PageNumberPagination
+    permission_classes = [IsAuthenticated]
     # parser_classes = (MultiPartParser, FormParser)
 
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
@@ -135,18 +136,20 @@ class OrderView(ModelViewSet):
         :param kwargs:
         :return:
         """
-        instance = self.get_object()
-        if not instance:
-            response_data = errorResponse(status_code=status.HTTP_400_BAD_REQUEST, error_code="not_found", message="Resource not found")
-            return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
-        serializer = self.get_serializer(instance, many=isinstance(request.data, list), partial=True, data=request.data)
-        serializer.is_valid(raise_exception=True)
-        serializer.update(instance, request.data)
-        data = successResponse(status_code=status.HTTP_200_OK,
-                               message_code="update_success",
-                               message=f"{instance} updated successfully")
-        headers = self.get_success_headers(serializer.data)
-        return Response(data=data, status=status.HTTP_200_OK, headers=headers)
+        if request.body is not None:
+            instance = self.get_object()
+            if not instance:
+                response_data = errorResponse(status_code=status.HTTP_400_BAD_REQUEST, error_code="not_found",
+                                              message="Resource not found")
+                return Response(data=response_data, status=status.HTTP_400_BAD_REQUEST)
+            serializer = self.get_serializer(instance, many=isinstance(request.data, list), partial=True, data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.update(instance, request.data)
+            data = successResponse(status_code=status.HTTP_200_OK,
+                                   message_code="update_success",
+                                   message=f"{instance} updated successfully")
+            headers = self.get_success_headers(serializer.data)
+            return Response(data=data, status=status.HTTP_200_OK, headers=headers)
 
     def destroy(self, request, *args, **kwargs):
         """
@@ -171,10 +174,6 @@ class OrderView(ModelViewSet):
                                                   "system admin to grant permission.")
 
             return Response(data=response_data, status=status.HTTP_403_FORBIDDEN)
-
-
-
-
 
 
 def cash_on_delivery_payment(response, order_id):
@@ -224,6 +223,3 @@ def send_sms(phone, orderID):
 def is_phone_number_valid(request, phone):
     print(phone[-9:])
     return Response({"matched": True})
-
-
-

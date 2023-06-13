@@ -1,6 +1,9 @@
 from rest_framework import status
 from rest_framework.generics import GenericAPIView
 from rest_framework.response import Response
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+from auth_apps.models import Account
 from .serializer import GoogleSocialAuthSerializer, FacebookAuthSerializer
 
 
