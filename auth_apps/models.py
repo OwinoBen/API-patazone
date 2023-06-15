@@ -1,5 +1,5 @@
 from django.contrib.auth.base_user import AbstractBaseUser, BaseUserManager
-
+from django_prometheus.models import ExportModelOperationsMixin
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
@@ -52,7 +52,7 @@ class apiAccount(BaseUserManager):
         return user
 
 
-class Account(AbstractBaseUser):
+class Account(ExportModelOperationsMixin('account'), AbstractBaseUser):
     email = models.EmailField(verbose_name="email", max_length=60, unique=True)
     username = None
     firstname = models.CharField(max_length=30, null=True, blank=True)

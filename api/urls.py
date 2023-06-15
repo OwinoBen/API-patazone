@@ -10,22 +10,13 @@ from drf_yasg import openapi
 from drf_yasg.views import get_schema_view as swagger_get_schema_view
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
-schema_view = swagger_get_schema_view(
-    openapi.Info(
-        title="Ecommerce Api",
-        default_version='v1',
-        description="Ecommerce API documentation",
-        contact=openapi.Contact(email="owinoben2020@gmail.com"),
-        license=openapi.License(name="MIT License")
-    ),
-    public=True,
-    # permission_classes=[permissions.AllowAny]
-)
-
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('base.urls', namespace='base'), ),
     path('o/', include('oauth2_provider.urls')),
+
+    # monitoring
+    path('prometheus/', include('django_prometheus.urls')),
 
     # documentation urls
     path('', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-schema'),

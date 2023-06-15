@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     'drf_spectacular',
     'drf_spectacular_sidecar',
+    'django_prometheus',
 
     'base',
     'auth_apps',
@@ -153,6 +154,7 @@ SIMPLE_JWT = {
 AUTH_USER_MODEL = 'auth_apps.Account'
 
 MIDDLEWARE = [
+    'django_prometheus.middleware.PrometheusBeforeMiddleware',
     'middleware.middleware.CustomHeaderMiddleware',
     'django.middleware.security.SecurityMiddleware',
 
@@ -164,6 +166,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'django_prometheus.middleware.PrometheusAfterMiddleware',
 
 ]
 
@@ -215,6 +219,13 @@ DATABASES = {
         # 'PASSWORD': 'patazone123',
     }
 
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django_prometheus.cache.backends.memcached.PyMemcacheCache',
+        'LOCATION': 'ecommerce-backend:11211',
+    }
 }
 
 if 'test' in sys.argv or 'test\_coverage' in sys.argv:  # Covers regular testing and django-coverage
