@@ -1,8 +1,8 @@
 import datetime
 import math
-import random
 
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 import uuid
 from django.conf import settings
 from django.db.models import Sum, Avg, Count
@@ -100,7 +100,7 @@ class OrderManager(models.Manager):
         return self.get_queryset().get_orders_by_weeks_range(weeks_ago=weeks_ago, number_of_weeks=number_of_weeks)
 
 
-class Coupon(models.Model):
+class Coupon(ExportModelOperationsMixin('coupon'), models.Model):
     code = models.CharField(max_length=15)
     amount = models.FloatField()
 
@@ -108,7 +108,7 @@ class Coupon(models.Model):
         return self.code
 
 
-class Orders(models.Model):
+class Orders(ExportModelOperationsMixin('orders'), models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False, unique=True)
     order_id = models.CharField(max_length=125, unique=True, blank=True, null=True)
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='user')
@@ -190,7 +190,7 @@ class Orders(models.Model):
         return self.status
 
 
-class OrderItems(models.Model):
+class OrderItems(ExportModelOperationsMixin('orderitems'), models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name="items")
     customer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='customer',
                                  blank=True, null=True)
@@ -235,7 +235,7 @@ class PurchasedProductManager(models.Manager):
         return self.get_queryset().active()
 
 
-class PurchesedProducts(models.Model):
+class PurchesedProducts(ExportModelOperationsMixin('purchesedproducts'), models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='order_products')
     refunded = models.BooleanField(default=False)
@@ -248,7 +248,7 @@ class PurchesedProducts(models.Model):
         return self.product.product_title
 
 
-class Refund(models.Model):
+class Refund(ExportModelOperationsMixin('refund'), models.Model):
     order = models.ForeignKey(Orders, on_delete=models.CASCADE, related_name='order_refund')
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='refund_user')
     reason = models.TextField()

@@ -1,4 +1,5 @@
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 import uuid
 import os
 import random
@@ -24,7 +25,7 @@ def imagePath(instance, filename):
     )
 
 
-class Brands(models.Model):
+class Brands(ExportModelOperationsMixin('brands'), models.Model):
     brand_id = models.UUIDField(primary_key=True, unique=True, editable=False, default=uuid.uuid4)
     category_id = models.ForeignKey(Categories, on_delete=models.SET_NULL, null=True, blank=True)
     brand_title = models.CharField(max_length=255)
@@ -38,7 +39,7 @@ class Brands(models.Model):
         return str(self.brand_id)
 
 
-class Product(models.Model):
+class Product(ExportModelOperationsMixin('product'), models.Model):
     product_id = models.UUIDField(primary_key=True, unique=True, default=uuid.uuid4, editable=False)
     product_title = models.CharField(max_length=255)
     vendor = models.CharField(max_length=255)
@@ -97,7 +98,7 @@ class Product(models.Model):
         return "%s" % self.product_title
 
 
-class ProductImages(models.Model):
+class ProductImages(ExportModelOperationsMixin('productimages'), models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="images")
     img = models.ImageField(upload_to=imagePath, default="", null=True, blank=True)
     date_created = models.DateTimeField(auto_now_add=True)

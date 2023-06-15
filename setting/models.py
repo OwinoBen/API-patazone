@@ -1,10 +1,11 @@
 from django.db import models
+from django_prometheus.models import ExportModelOperationsMixin
 from products.models import imagePath
 
 
 # Create your models here.
 
-class SystemSetting(models.Model):
+class SystemSetting(ExportModelOperationsMixin('systemsetting'), models.Model):
     name = models.CharField(null=False, max_length=200)
     email = models.EmailField(null=True)
     phone = models.CharField(null=True, max_length=100)

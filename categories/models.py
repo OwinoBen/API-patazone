@@ -3,7 +3,10 @@ import uuid
 
 
 # Create your models here.
-class Categories(models.Model):
+from django_prometheus.models import ExportModelOperationsMixin
+
+
+class Categories(ExportModelOperationsMixin('categories'), models.Model):
     id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4)
     category_name = models.CharField(max_length=30)
     category_image = models.ImageField(upload_to="categories", default="", null=True, blank=True)
@@ -16,7 +19,7 @@ class Categories(models.Model):
         return str(self.id)
 
 
-class Subcategories(models.Model):
+class Subcategories(ExportModelOperationsMixin('subcategories'), models.Model):
     id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE, related_name="categories")
     subcategory_name = models.CharField(max_length=255)
@@ -27,7 +30,7 @@ class Subcategories(models.Model):
         return str(self.id)
 
 
-class SubsubCategories(models.Model):
+class SubsubCategories(ExportModelOperationsMixin('subsubcategories'), models.Model):
     id = models.UUIDField(primary_key=True, editable=False, unique=True, default=uuid.uuid4)
     category = models.ForeignKey(Categories, on_delete=models.CASCADE, related_name="categoryID")
     subcategory = models.ForeignKey(Subcategories, on_delete=models.CASCADE, related_name="subcategoryID")
