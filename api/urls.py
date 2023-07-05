@@ -2,12 +2,8 @@ from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework import permissions
 
-from base import views
 
-from drf_yasg import openapi
-from drf_yasg.views import get_schema_view as swagger_get_schema_view
 from drf_spectacular.views import SpectacularAPIView, SpectacularRedocView, SpectacularSwaggerView
 
 urlpatterns = [

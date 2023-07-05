@@ -53,9 +53,12 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist',
-    'drf_yasg',
+
+    # documentation
     'drf_spectacular',
     'drf_spectacular_sidecar',
+
+    # Monitoring
     'django_prometheus',
 
     'base',
