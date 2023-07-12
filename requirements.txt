@@ -1,12 +1,49 @@
-# backports.zoneinfo==0.2.1
+
 Django==4.2.1
+django-braces==1.15.0
+django-cors-headers==4.2.0
 django-filter==23.2
+django-oauth-toolkit==2.2.0
+django-prometheus==2.3.1
 djangorestframework==3.14.0
+djangorestframework-simplejwt==5.2.2
+drf-spectacular==0.26.2
+drf-spectacular-sidecar==2023.5.1
+drf-yasg==1.21.5
+facebook-sdk==3.1.0
 Faker==18.7.0
-# mysql==0.0.3
-# mysqlclient==2.1.1
-# numpy==1.24.3
-# pandas==2.0.1
+flake8==6.0.0
+google-api-core==2.11.0
+google-api-python-client==2.86.0
+google-auth==2.17.3
+google-auth-httplib2==0.1.0
+googleapis-common-protos==1.59.0
+gunicorn==20.1.0
+Markdown==3.4.3
+oauthlib==3.2.2
+Pillow==9.5.0
+
+
+prometheus-client==0.17.0
+
+psycopg2-binary==2.9.6
+
+pyflakes==3.0.1
+PyJWT==2.6.0
+pylint==2.17.4
+pylint-django==2.5.3
+pylint-plugin-utils==0.7
+pymemcache==4.0.0
+pyparsing==3.0.9
+pyrsistent==0.19.3
+python-dateutil==2.8.2
 python-dotenv==1.0.0
-requests~=2.30.0
-# urllib3
+pytz==2023.3
+PyYAML==6.0
+requests==2.30.0
+
+six==1.16.0
+
+urllib3==1.26.9
+
+
